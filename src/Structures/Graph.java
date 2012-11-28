@@ -8,11 +8,19 @@ public class Graph {
 	Vertex[] vertices;
 	
 	public Graph(Scanner sc) {
-		vertices = new Vertex[sc.nextInt()];
-		for(int i=0; i<vertices.length; i++){
-			
-		}
+		this.vertices = new Vertex[Integer.parseInt(sc.nextLine().trim())];
 		
+		
+		//Creates vertex for each student and fills 'vertices' array
+		for(int i=0; i<vertices.length; i++){
+			String t = sc.nextLine();
+			if(t.charAt(t.indexOf('|')+1) == 'y'){
+				vertices[i] = new Vertex(t.substring(0, t.indexOf('|')),  
+						t.substring((t.indexOf('|'))+3, t.length()-1), null);
+			}
+			else{vertices[i] = new Vertex(t.substring(0, t.indexOf('|')), null, null);}
+		}
+		System.out.println(this.vertices.toString());
 	}
 
 	class Neighbor{
@@ -26,13 +34,11 @@ public class Graph {
 
 	public class Vertex {
 		String name;	
-		boolean student;
 		String school;
 		Neighbor neighbors;
 		
-		public Vertex(String name, boolean student, String school, Neighbor neighbors ) {
+		public Vertex(String name, String school, Neighbor neighbors ) {
 			this.name = name;
-			this.student = student;
 			this.school = school;
 			this.neighbors = neighbors;
 		}
