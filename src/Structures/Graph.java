@@ -1,5 +1,7 @@
 package Structures;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Scanner; 
 
@@ -12,13 +14,12 @@ public class Graph {
 	public Graph(Scanner sc) {
 		this.vertices = new Vertex[Integer.parseInt(sc.nextLine().trim())];
 		
-		
 		//Creates vertex for each student and fills 'vertices' array
 		for(int i=0; i<vertices.length; i++){
 			String t = sc.nextLine().trim();
 			if(t.charAt(t.indexOf('|')+1) == 'y'){
 				vertices[i] = new Vertex(t.substring(0, t.indexOf('|')),  
-						t.substring((t.indexOf('|'))+3, t.length()-1), null);
+						t.substring((t.indexOf('|'))+3, t.length()), null);
 			}
 			else{vertices[i] = new Vertex(t.substring(0, t.indexOf('|')), null, null);}
 		}
@@ -71,7 +72,6 @@ public class Graph {
 			this.neighbors = neighbors;
 		}
 	}
-	Vertex[] adjLists;
 	
 
 
@@ -87,10 +87,40 @@ public class Graph {
 	/**
 	 *  Finds the shortest path between two people.
 	 *  Prints the sequence of names.
+	 *  Greedy Algorithm maybe?
 	 */	
-	public String shortestChain(String sName, String eName){
-		return null;
+	public void shortestChain(String sName, String eName){
+		int vsource = indexForName(sName);
+		int vend = indexForName(eName);
+		ArrayList<Vertex> seen = new ArrayList<Graph.Vertex>(vertices.length);
+		ArrayList<Vertex> unseen = new ArrayList<Graph.Vertex>(vertices.length);
+		ArrayList<Vertex> fringe = new ArrayList<Graph.Vertex>(vertices.length);
+		ArrayList<Vertex> done = new ArrayList<Graph.Vertex>(vertices.length);
 		
+		seen.add(vertices[vsource]);		
+	}
+	
+	
+	/**
+	 * Prints a textual representation of the graph
+	 */
+	public void printGraph(){
+		System.out.println(vertices.length);
+		for(int v = 0; v < vertices.length; v++){
+			if(vertices[v].school != null)
+				System.out.println(vertices[v].name + "|y|" + vertices[v].school);
+			else{
+				System.out.println(vertices[v].name + "|n");
+			}
+		}
+		for(int v = 0; v < vertices.length; v++){
+			Neighbor ptr = vertices[v].neighbors;
+			while(ptr != null){
+				System.out.println(vertices[v].name + "|" + nameForIndex(ptr.vnum));
+				ptr = ptr.next;
+			}
+			
+		}
 	}
 	
 	/**
