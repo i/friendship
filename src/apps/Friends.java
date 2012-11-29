@@ -38,7 +38,7 @@ static Scanner userin = new Scanner(System.in);
 		Graph graph;
 //		try{
 			graph = new Graph(new Scanner(new File(graphFile)));
-			System.out.println(graph);
+
 		
 
 			char option;

@@ -8,10 +8,12 @@ public class Graph {
 
 	int size;
 	Vertex[] vertices;
+	Hashtable<String , Integer>  hash;
 	
 
 	public Graph(Scanner sc) {
 		this.vertices = new Vertex[Integer.parseInt(sc.nextLine().trim())];
+		Hashtable<String , Integer>  hash = new Hashtable<String, Integer>(this.vertices.length);
 		
 		//Creates vertex for each student and fills 'vertices' array
 		for(int i=0; i<vertices.length; i++){
@@ -21,7 +23,9 @@ public class Graph {
 						t.substring((t.indexOf('|'))+3, t.length()), null);
 			}
 			else{vertices[i] = new Vertex(t.substring(0, t.indexOf('|')), null, null);}
+			hash.put(t.substring(0, t.indexOf('|')), i);
 		}
+		
 		
 	
 		while(sc.hasNextLine()){
@@ -42,12 +46,8 @@ public class Graph {
 		return vertices[index].name;
 	}
 	
-	int indexForName(String n){
-		for(int i=0; i<vertices.length; i++){
-			if(vertices[i].name.equals(n))
-				return i;
-		}
-		return -1;
+	int indexForName(String name){
+		return hash.get(name);
 	}
 		
 
