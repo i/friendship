@@ -6,7 +6,8 @@ import java.util.Scanner;
 
 public class Graph {
 
-	int size;
+	int size;  //number of edges
+	int edges;
 	Vertex[] vertices;
 	Hashtable<String , Integer>  hash;
 	
@@ -27,7 +28,7 @@ public class Graph {
 		}
 		
 		
-	
+		//reads edges
 		while(sc.hasNextLine()){
 			String t = sc.nextLine().trim();
 			int pipe = t.indexOf('|');
@@ -38,6 +39,7 @@ public class Graph {
 			vertices[v2].neighbors = new Neighbor(v1, vertices[v2].neighbors);
 
 			System.out.println(nameForIndex(v1) + " is now friends with " + nameForIndex(v2)+'.');
+			edges++;
 		}
 	
 	}
@@ -77,6 +79,7 @@ public class Graph {
 	/**
 	 * Makes a graph consisting only of the students at a certain school.
 	 * Prints the graph in the same format as input file.
+	 * 
 	 */	
 	public String atSchool(String school){
 		return null;
@@ -89,6 +92,7 @@ public class Graph {
 	 *  Greedy Algorithm maybe?
 	 */	
 	public void shortestChain(String sName, String eName){
+		
 		int[] distance = new int[vertices.length];
 		Vertex vsource	= vertices[indexForName(sName)];
 		Vertex vend		= vertices[indexForName(eName)];
@@ -101,10 +105,11 @@ public class Graph {
 		for(Vertex v : unseen)
 			{unseen.add(v);}
 		
-		//transfer vsource to done
+		// step 2 - transfer vsource to done
 		unseen.remove(vsource);
 		done.add(vsource);
 		
+		// step 3 - 
 		Neighbor neighborPTR = vsource.neighbors;
 		for(Neighbor w = vsource.neighbors; w != null; w = w.next){
 			fringe.add(w);
