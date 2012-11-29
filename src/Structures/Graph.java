@@ -8,35 +8,43 @@ public class Graph {
 	int size;
 	Vertex[] vertices;
 	
+
 	public Graph(Scanner sc) {
 		this.vertices = new Vertex[Integer.parseInt(sc.nextLine().trim())];
 		
 		
 		//Creates vertex for each student and fills 'vertices' array
 		for(int i=0; i<vertices.length; i++){
-			String t = sc.nextLine();
+			String t = sc.nextLine().trim();
 			if(t.charAt(t.indexOf('|')+1) == 'y'){
 				vertices[i] = new Vertex(t.substring(0, t.indexOf('|')),  
 						t.substring((t.indexOf('|'))+3, t.length()-1), null);
 			}
 			else{vertices[i] = new Vertex(t.substring(0, t.indexOf('|')), null, null);}
 		}
-		System.out.println(this.vertices.toString());
+		
 	
-		while(sc.hasNext()){
-			String t = sc.nextLine();
+		while(sc.hasNextLine()){
+			String t = sc.nextLine().trim();
 			int pipe = t.indexOf('|');
 			int v1 = indexForName(t.substring(0,pipe));
 			int v2 = indexForName(t.substring(pipe+1));
-			adjLists[v1].neighbors = new Neighbor(v2, adjLists[v1].neighbors);
-			adjLists[v2].neighbors = new Neighbor(v1, adjLists[v2].neighbors);
+			
+			vertices[v1].neighbors = new Neighbor(v2, vertices[v1].neighbors);
+			vertices[v2].neighbors = new Neighbor(v1, vertices[v2].neighbors);
+
+			System.out.println(nameForIndex(v1) + " is now friends with " + nameForIndex(v2)+'.');
 		}
 	
 	}
 	
-	int indexForName(String name){
+	String nameForIndex(int index){
+		return vertices[index].name;
+	}
+	
+	int indexForName(String n){
 		for(int i=0; i<vertices.length; i++){
-			if(vertices[i].equals(name))
+			if(vertices[i].name.equals(n))
 				return i;
 		}
 		return -1;
