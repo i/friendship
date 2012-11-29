@@ -1,0 +1,479 @@
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+
+<title>CS112 Fall 2012 - Friendship Graph Algorithms</title>
+<style>
+body { font: 14px Trebuchet MS, Verdana, Arial, Helvetica, sans-serif; }
+div.code { background: lightgrey; }
+table { border-collapse: collapse; cellspacing: 0px; margin-left: 10%;}
+th { font: bold 14px Trebuchet MS; border-bottom: 1px solid black; padding: 10px;}
+td { padding-right: 20px; padding-top: 5px; font: 13px Trebuchet MS; }
+td.pts { text-align: center; }
+a, a:visited { color: blue; }
+pre { color: blue; }
+span.new { color: red; font-size: 16px;}
+tt, code { color: blue; }
+strong { color: red; }
+</style>
+</head><body>
+<center>
+<h2>CS112 Fall 2012: Programming Assignment 4</h2>
+<h2>Friendship Graph Algorithms</h2>
+<h3>Posted Tue, Nov 27. Due Fri, Dec 7, 11:00 PM 
+</h3><h3>Worth 100 points = 10% of your course grade</h3> 
+</center>
+<hr>
+<p>In this assignment, you will implement some useful algorithms that apply
+to friendship graphs of the Facebook kind.
+
+</p><p>You will work on this assignment in PAIRS.
+INDIVIDUAL SUBMISSIONS WILL NOT BE ACCEPTED.
+
+</p><p>Read <a href="http://www.cs.rutgers.edu/policies/academicintegrity/index.php?page=3">
+DCS Academic Integrity Policy for Programming Assignments</a> - you are responsible for abiding 
+by the policy. In particular, note that "<b>All Violations of the Academic Integrity Policy will 
+be reported by the instructor to the appropriate Dean</b>". (For this assignment, each
+<em>pair</em> of partners must write its own code.)
+
+</p><p>There will NOT be an extension pass option for this assignment.
+
+</p><hr>
+
+<ul>
+<li><a href="#bg">Background</a>
+</li><li><a href="#algo">Algorithms</a>
+</li><li><a href="#impl">Implementation</a>
+</li><li><a href="#submit">Submission</a>
+</li></ul>
+
+<p></p><hr>
+<p><a name="bg"></a></p><h3><a name="bg">Background</a></h3>
+
+<p>In this program, you will implement some useful algorithms for
+graphs that represent friendships, such as Facebook. A friendship graph
+is an undirected graph without any weights on the edges. It is a simple
+graph because there are no self loops (a self loop is an edge from a vertex to
+itself), or multiple edges (a multiple edge means more than edge between a
+pair of vertices).
+
+</p><p>The vertices in the graphs for this assignment represent two kinds of people:
+students and non-students. Each vertex will store the name of the person.
+If the person is a student, the name of the school will also be stored.
+
+</p><p>Here's a sample friendship graph:
+</p><pre>     (sam,rutgers)---(jane,rutgers)-----(bob,rutgers)   (sergei,rutgers)
+                          |                 |             |
+                          |                 |             |
+                     (kaitlin,rutgers)   (samir)----(aparna,rutgers)
+                          |                            |
+                          |                            |
+  (ming,penn state)----(nick,penn state)----(ricardo,penn state)
+                          |
+                          |
+                     (heather,penn state)
+
+
+                   (michele,cornell)----(rachel)     
+                          | 
+                          | 
+     (rich,ucla)---(tom,ucla)
+</pre>
+Note that the graph may not be connected, as seen in this example in which there
+are two "islands" or cliques that are not connected to each other by any edge.
+Also see that all the vertices represent students with names of schools, except for
+<tt>rachel</tt> and <tt>samir</tt>, who are not students.
+
+<p></p><hr>
+<p><a name="algo"></a></p><h3><a name="algo">Algorithms</a></h3>
+
+<ol>
+<li>
+<p><a name=""></a></p><h4><a name="">Subgraph: Students at a school</a></h4>
+
+<p>You want to be able to focus exclusively on students in a particular school, and
+all the friendships between them. To do this, you will have to extract an
+appropriate subgraph out of the full graph. Here is the subgraph of students at
+rutgers, extracted from the original sample graph:
+
+</p><pre>     (sam,rutgers)---(jane,rutgers)-----(bob,rutgers)    (sergei,rutgers)
+                          |                                |
+                          |                                |
+                     (kaitlin,rutgers)             (aparna,rutgers)
+</pre>
+
+</li><li><p><a name=""></a></p><h4><a name="">Shortest path: Intro Chain </a></h4>
+
+<p><tt>sam</tt> wants an intro to <tt>aparna</tt> through friends and friends
+of friends. There are two possible chains of intros:
+</p><pre>  sam--jane--kaitlin--nick--ricardo--aparna
+            or
+  sam--jane-bob--samir--aparna
+</pre>
+The second chain is preferable since it is shorter. 
+
+<p>If <tt>sam</tt> wants to be introduced to <tt>michele</tt> through a chain of
+friends, he is out of luck since there is no chain that leads from <tt>sam</tt> to
+<tt>michele</tt> in the graph.
+
+</p><p>Note that this algorithm does NOT have any restriction on the composition of the
+vertices: a vertex along the shortest chain need NOT be a student at a particular
+school, or even a student. So, for instance, you may have to find the shortest intro
+chain from <tt>nick</tt> to <tt>samir</tt>, which has the following solution:
+</p><pre>   nick--ricardo--aparana--samir
+</pre>
+which consists of two penn state students, one rutgers student, and one non-student.
+
+</li><li><p><a name=""></a></p><h4><a name="">Connected Islands: Cliques</a></h4>
+
+<p>Students tend to form cliques with their friends, which creates
+islands that do not connect with each other. If these cliques could be identified,
+particularly in the student population at a particular school,
+introductions could be made between people in different cliques to build larger
+networks of friendships at that school. 
+
+</p><p>In the sample graph, there are two island cliques for students at rutgers:
+</p><pre>     (sam,rutgers)---(jane,rutgers)-----(bob,rutgers)    (sergei,rutgers)
+                          |                                |
+                          |                                |
+                     (kaitlin,rutgers)             (aparna,rutgers)
+</pre>
+
+<p>If we were to look at students at penn state, instead, there is a single clique:
+</p><pre>   (ming,penn state)----(nick,penn state)----(ricardo,penn state)
+                          |
+                          |
+                     (heather,penn state)
+</pre>
+<p>And again, a single clique for students at ucla:
+</p><pre>     (rich,ucla)---(tom,ucla)
+</pre>
+<p>And one for students at cornell:
+</p><pre>             (michele,cornell)
+</pre>
+<p>From these examples, it should be clear that if there is at least one student
+in the graph that goes to a particular school, then there must be at least one
+island clique in the graph for students at that school.
+
+</p></li><li><p><a name=""></a></p><h4><a name="">Connectors: Friends who keep friends together </a></h4>
+
+<p>If <tt>jane</tt> were to leave rutgers, <tt>sam</tt> would no longer be able to
+connect with anyone else--<tt>jane</tt> was the "connector" who could pull
+<tt>sam</tt> in to hang out with her other friends. Similarly, <tt>aparna</tt>
+is a connector, since without her, <tt>sergei</tt> would not be able to 
+"reach" anyone else. (And there are more connectors in the graph...)
+
+</p><p>On the other hand <tt>samir</tt> is not a connector. Even if he were to leave,
+everyone else could still "reach" whoever they could when <tt>samir</tt> was there,
+even though they may have to go through a longer chain.
+
+</p><p>A precise definition of a connector in any undirected graph is a vertex, v,
+such that there are at least two other vertices x and w for which <em>every</em> path
+between x and w goes through v. For example, <tt>v=jane</tt>,
+<tt>x=sam</tt>, and <tt>w=bob</tt>.
+
+</p><p>Finding all connectors in an undirected graph can be done using DFS (depth-first search),
+but keeping track of a couple more numbers for every vertex <tt>v</tt>. These are:
+</p><ul>
+<li><tt>dfsnum(v)</tt>: This is the dfs number, assigned when a vertex is visited, dealt out
+in increasing order.
+</li><li><tt>back(v)</tt>: This is a number that is initially assigned when a vertex is
+visited, and is equal to <tt>dfsnum</tt>, but can be changed later based on three conditions:
+<ul>
+<li>When the DFS backs up from a neighbor, <tt>w</tt>, to <tt>v</tt>,
+if <tt>dfsnum(v)</tt> &gt; 
+<tt>back(w)</tt>, then <tt>back(v)</tt> is set to min(<tt>back(v)</tt>,<tt>back(w)</tt>)
+</li><li>If a neighbor, <tt>w</tt>, is already visited then
+<tt>back(v)</tt> is set to min(<tt>back(v)</tt>,<tt>dfsnum(w)</tt>)
+</li></ul>
+</li></ul>
+<p>When the DFS backs up from a neighbor, <tt>w</tt>, to <tt>v</tt>,
+if <tt>dfsnum(v)</tt> &#8804; <tt>back(w)</tt>, then <tt>v</tt> is identified as
+a connector, IF <tt>v</tt> is NOT the starting point
+for the DFS.
+(If <tt>v</tt> is a starting point for DFS, it can be a connector, but
+another check must be made - see the examples below. The examples don't tell
+you how to identify such cases, that's up to you.)
+
+</p><p>Here are some examples that show how this works. 
+
+</p><ul>
+<li>Example 1: (B is a connector)
+<pre>    A--B--C
+</pre>
+The DFS starts at A. Neighbors for a vertex are stored in REVERSE alphabetical order:
+<pre>  
+  A: B
+  B: C,A
+  C: B
+
+  dfs @ A  1/1  (dfsnum/back)
+      dfs @ B 2/2
+          dfs @ C 3/3
+              neighbor B is already visited =&gt; C 3/2
+          dfsnum(B) &lt;= back(C) B is a CONNECTOR
+          nbr A is already visited =&gt; B 2/1
+      dfsnum(A) &lt;= back(B) A is starting point of DFS, NOT connector
+</pre>
+
+<p></p></li><li>Example 2: (B is a connector)
+<pre>   A--B--C
+</pre>
+The same example as the first, except DFS starts at B. This shows how even thought B is
+the starting point, it is still identified (correctly) as a connector. The code is
+not complete because it does not show HOW B is determined to be a connector
+in the last line - that's for you to figure out. Neighbors are
+stored in reverse alphabetical order as before.
+<pre>  dfs @ B  1/1 
+      dfs @ C 2/2
+          nbr B is already visited =&gt; C 2/1
+      dfsnum(B) &lt;= back(C) B is starting point, NOT connector
+      dfs @ A 3/3
+          nbr B is already visited =&gt; A 3/1
+      dfsnum(B) &lt;= back(A) B is starting point, but is a CONNECTOR
+</pre>
+
+<p></p></li><li>Example 3: (B and D are connectors)
+<pre>    A---B---C
+        |   |
+        E---D---F
+</pre>
+<p>DFS starts at A. Neighbors stored in reverse alphabetical order again:
+</p><pre>  A: B
+  B: E,C,A
+  C: D,B
+  D: F,E,C
+  E: D,B
+  F: D
+
+  dfs @ A 1/1
+      dfs @ B 2/2
+          dfs @ E 3/3
+              dfs @ D 4/4
+                  dfs @ F 5/5
+                      nbr D is already visited =&gt; F 5/4
+                  dfsnum(D) &lt;= back(F) =&gt; D is a CONNECTOR
+                  nbr E already visited =&gt; D 4/3
+                  dfs @ C 6/6
+                      nbr D already visited =&gt; C 6/4
+                      nbr B already visited =&gt; C 6/2
+                  dfsnum(D) &gt; back(C) =&gt; D 4/2
+              dfsnum(E) &gt; back(D) =&gt; E 3/2
+              nbr B is already visited =&gt; E 3/2
+          dfsnum(B) &lt;= back(E) =&gt; B is a CONNECTOR
+          nbr C is already visited =&gt; B 2/2
+          nbr A is already visited =&gt; B 2/1
+      dfsnum(A) &lt;= back(B) A is starting point, NOT connector
+</pre>
+
+<p></p></li><li>Example 4: (B and D are connectors)
+<pre>    A---B---C
+        |   |
+        E---D---F
+</pre>
+<p>Same example as the previous, except DFS starts at D, and neighbors stored
+in alphabetical order. Connectors are still correctly identified as B and D.
+</p><pre>  A: B
+  B: A,C,E
+  C: B,D
+  D: C,E,F
+  E: B,D
+  F: D
+
+  dfs @ D 1/1
+      dfs @ C 2/2
+          dfs @ B 3/3
+              dfs @ A 4/4
+                  nbr B is already visited =&gt; A 4/3
+              dfsnum(B) &lt;= back(A) =&gt; B is a CONNECTOR
+              nbr C is already visited =&gt; B 3/2
+              dfs @ E 5/5
+                  nbr B is already visited =&gt; E 5/3
+                  nbr D is already visited =&gt; E 5/1
+              dfsnum(B) &gt; back(E) =&gt; B 3/1
+          dfsnum(C) &gt; back(B) =&gt; C 2/1
+          nbr D is already visited =&gt; C 2/1
+      dfsnum(D) &lt;= back(C) D is starting point, NOT connector
+      dfs @ F 6/6
+          nbr D is already visited =&gt; F 6/1
+      dfsnum(D) &lt;= back(F) D is starting point, is a CONNECTOR
+</pre></li></ul>
+
+</li></ol>
+
+<p></p><hr>
+<a name="impl"><h3>Implementation</h3></a>
+
+<p>You will write a program called <tt>Friends</tt> that will read a graph file,
+build a graph (using the adjacency linked lists representation), and implement the
+four algorithms described above. The following describes the inputs and outputs
+for all the functionality you need to implement, as well as point assignment.
+
+</p><ol>
+<li><a name=""><h4>(5 pts) User interface</h4></a>
+<ul>
+<li>Your user interface should ask for the input graph file, build the graph,
+then spin on five choices--students at a school, shortest intro chain, cliques at
+school, connectors, and quit--until the user quits.
+</li></ul>
+
+<p></p></li><li><a name=""><h4>(10 pts) Graph build</h4></a>
+<ul>
+<li>Input: file that lists names of all people and edges between them. Here is 
+the format of the input file for the sample friendship graph given in the
+<tt>Background</tt> section.
+<pre>   15
+   sam|y|rutgers
+   jane|y|rutgers
+   michele|y|cornell
+   sergei|y|rutgers
+   ricardo|y|penn state
+   kaitlin|y|rutgers
+   samir|n
+   aparna|y|rutgers
+   ming|y|penn state
+   nick|y|penn state
+   bob|y|rutgers
+   heather|y|penn state
+   rachel|n
+   rich|y|ucla
+   tom|y|ucla
+   sam|jane
+   jane|bob
+   jane|kaitlin
+   kaitlin|nick
+   bob|samir
+   sergei|aparna
+   samir|aparna
+   aparna|ricardo
+   nick|ricardo
+   ming|nick
+   heather|nick
+   michele|rachel
+   michele|tom
+   tom|rich
+</pre>
+<p>The first line has the number of people in the graph (15 in this case). 
+
+</p><p>The next set of lines has information about the people in the graph, one line per
+person (15 lines in this example), with the '|' used to separate the fields. 
+In each line, the first field is the name of
+the person. Names of people can have any character except '|', and are case
+<em>insensitive</em>. The second field is 'y' if
+the person is a student, and 'n' if not. The third field is 
+only present for students, and is the name of the school the student attends.
+The name of a school can have any character except '|', and is
+case <em>insensitive</em>.
+
+</p><p>The last set of lines, following the people information, lists the friendships
+between people, one friendship per line. Since friendship works both ways, any
+friendship is only listed once, and the order in which the names of the friends
+is listed does not matter.
+
+</p></li><p></p><li>Result: The ajacency linked list representation, along with a data structure
+to be able to quickly translate from a person's name to vertex number. There should
+also be a quick way to translate from vertex number to the person's
+name. 
+<p></p></li><li>Output: <font color="red">You don't have to print the representation, we
+will check your code to see if you are storing the graph in this representation.</font>
+</li></ul>
+<p></p></li><li><a name=""><h4>(15 pts) Subgraph (students at a school)</h4></a>
+<ul>
+<li>Input: Name of school (case insensitive), e.g. "penn state"
+</li><p></p><li>Result: Subgraph of original graph, vertices are all students at the given school,
+edges are a subset of the edges of the original graph such that both endpoints are
+students at the school. The subgraph must be in stored in the adjacency linked
+lists form, just as for the original graph.
+<p></p></li><li>Output: Print the subgraph in the same format as the
+input in the <b>Graph build</b> section above.
+</li></ul>
+<p></p></li><li><a name=""><h4>(20 pts) Shortest path (Intro chain)</h4></a>
+<ul>
+<li>Input: Name of person who wants the intro, and the name of the other person,
+e.g. "sam" and "aparna" for the graph in the Background section. 
+(Neither of these, nor any of the intermediate people are
+required to be students, in the same school or otherwise.)
+</li><p></p><li>Result: The shortest chain of people in the graph
+starting at the first and ending at the second. 
+<p></p></li><li>Output: Print the chain of people in the shortest path, for example:
+<pre>sam--jane-bob--samir--aparna
+</pre>
+If there is no way to get from the first person to the second person, then the 
+output should be a message to this effect.
+</li></ul>
+<p></p></li><li><a name=""><h4>(15 pts) Connected Islands (cliques)</h4></a>
+<ul>
+<li>Input: Name of school for which cliques are to be found, e.g. "rutgers"
+</li><p></p><li>Result: The subgraphs for each of the cliques. 
+<p></p></li><li>Output: Print the subgraph for each clique, in the same format as
+the input described in the <tt>Graph build</tt> section. For example:
+<pre>Clique 1:
+
+&lt;subgraph output&gt;
+
+Clique 2:
+
+&lt;subgraph output&gt;
+
+etc...
+</pre>
+
+Note: If there is even one student at the named school in the graph, then
+there must be at least
+one clique in the output. If the graph has no students at all at that school,
+then the output will be empty. 
+</li></ul>
+<p></p></li><li><a name=""><h4>(25 pts) Connectors (Friends who keep friends together)</h4></a>
+<ul>
+<li>Input: Nothing
+</li><p></p><li>Result: Names of all people who are connectors in the graph
+<p></p></li><li>Output: Print names of all people who are connectors in the graph, comma
+separated, in any order.
+</li></ul>
+<p></p></li><li><a name=""><h4>(10 pts) Efficiency</h4></a>
+<ul>
+<li>Your program will be assessed for efficiency in space usage and running time.
+Assume that the input graph in general can have several tens of thousands
+of vertices (people), and that each person will have, on average, about 100 friends.
+Think carefully through the algorithms to make sure you implement them as efficiently
+as you can.
+
+<p>Remember, translating between a person's name and vertex number, as well as the other
+way around, should done efficiently. When implementing the algorithms, you will
+need to maintain additional data structures--pay particular attention to the space
+you use for the data structures. 
+
+</p></li></ul>
+</li></ol>
+
+<p>Your program MUST be called <tt>Friends</tt> - in other words, you must have a filed
+named <tt>Friends.java</tt> with a <tt>main</tt> method.
+
+</p><p>You may implement as many classes as you want, and separate them into packages as needed.
+
+</p><p>You may import any of the classes from <tt>java.lang</tt>, 
+<tt>java.io</tt> and <tt>java.util</tt>, but you may NOT 
+import classes from any of the other packages in the standard Java API, and you may NOT 
+import classes from any external java APIs. (Of course, if you have more than one package in your 
+application, you can cross-import classes among them.) Note: The <tt>java.util.TreeMap</tt> 
+class may be useful--it implements a red-black
+tree, which, like the AVL tree, is a balanced binary search tree with O(log n) worst case
+insert/delete/search times.
+
+</p><h3><a name="submit">Submission</a></h3>
+
+In the <tt>Friends.java</tt> file, <font color="red">make sure you write the names of
+both members of your team in comment lines at the top. </font>
+<p>Export your entire Eclipse project as a zip archive into a file called
+<tt>friends.zip</tt>, 
+and upload this file to Sakai. (See the Eclipse page for how to do this.)
+
+</p><p>If you submit an 
+incorrect/incomplete project, you will lose credit. So before you submit,
+you should check that all is well by importing your friends.zip file as a project
+into Eclipse (in a different workspace, so it doesn't conflict with your
+existing project), and running it.
+
+</p><p>ONLY ONE PERSON per team should submit the assignment.
+
+
+</p></body></html>

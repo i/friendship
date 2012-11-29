@@ -47,7 +47,11 @@ static Scanner userin = new Scanner(System.in);
 					//do the students at school thing
 				}
 				else if(option == '2'){
-					//do shortest intro chain
+					System.out.println("Enter name of person:");
+					String sName = userin.next();
+					System.out.println("Enter name of person they want to meet:");
+					String eName = userin.next();
+					graph.shortestChain(sName, eName);
 				}
 				else if(option == '3'){
 					//do the cliques at school thing

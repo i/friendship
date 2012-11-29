@@ -1,6 +1,5 @@
 package Structures;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Scanner; 
@@ -90,14 +89,28 @@ public class Graph {
 	 *  Greedy Algorithm maybe?
 	 */	
 	public void shortestChain(String sName, String eName){
-		int vsource = indexForName(sName);
-		int vend = indexForName(eName);
-		ArrayList<Vertex> seen = new ArrayList<Graph.Vertex>(vertices.length);
-		ArrayList<Vertex> unseen = new ArrayList<Graph.Vertex>(vertices.length);
-		ArrayList<Vertex> fringe = new ArrayList<Graph.Vertex>(vertices.length);
-		ArrayList<Vertex> done = new ArrayList<Graph.Vertex>(vertices.length);
+		int[] distance = new int[vertices.length];
+		Vertex vsource	= vertices[indexForName(sName)];
+		Vertex vend		= vertices[indexForName(eName)];
+		ArrayList<Vertex> 	seen	= new ArrayList<Vertex>(vertices.length);
+		ArrayList<Vertex> 	unseen	= new ArrayList<Vertex>(vertices.length);
+		ArrayList<Vertex> 	done	= new ArrayList<Vertex>(vertices.length);
+		ArrayList<Neighbor> fringe	= new ArrayList<Neighbor>(vertices.length);
 		
-		seen.add(vertices[vsource]);		
+		// step 1 - Put all vertices in unseen
+		for(Vertex v : unseen)
+			{unseen.add(v);}
+		
+		//transfer vsource to done
+		unseen.remove(vsource);
+		done.add(vsource);
+		
+		Neighbor neighborPTR = vsource.neighbors;
+		for(Neighbor w = vsource.neighbors; w != null; w = w.next){
+			fringe.add(w);
+			distance[w.vnum]++;
+		}
+		
 	}
 	
 	
@@ -123,6 +136,33 @@ public class Graph {
 		}
 	}
 	
+	/**
+	 * depth first search... what else?
+	 */
+	public void dfs() {
+		boolean[] visited = new boolean[vertices.length];
+		for (int v=0; v < visited.length; v++) {
+			visited[v] = false;
+		}
+		for (int v=0; v < visited.length; v++) {
+			if (!visited[v]) {
+				System.out.println("Starting at " + vertices[v].name);
+				dfs(v, visited);
+			}
+		}
+	}
+	
+	// recursive DFS
+	private void dfs(int v, boolean[] visited) {
+		visited[v] = true;
+		System.out.println("visiting " + vertices[v].name);
+		for (Neighbor e=vertices[v].neighbors; e != null; e=e.next) {
+			if (!visited[e.vnum]) {
+				System.out.println(vertices[v].name + "--" + vertices[e.vnum].name);
+				dfs(e.vnum, visited);
+			}
+		}
+	}
 	/**
 	 * finds cliques (separate groups) at a particular school.
 	 * prints the subgraphs in format of input file.
