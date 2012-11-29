@@ -1,6 +1,6 @@
 package Structures;
 
-import java.util.Scanner; // sup
+import java.util.Scanner; //khfytdilyuf
 
 public class Graph {
 
