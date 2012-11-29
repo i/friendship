@@ -1,6 +1,7 @@
 package Structures;
 
-import java.util.Scanner; //khfytdilyuf
+import java.util.Hashtable;
+import java.util.Scanner; 
 
 public class Graph {
 
@@ -21,7 +22,26 @@ public class Graph {
 			else{vertices[i] = new Vertex(t.substring(0, t.indexOf('|')), null, null);}
 		}
 		System.out.println(this.vertices.toString());
+	
+		while(sc.hasNext()){
+			String t = sc.nextLine();
+			int pipe = t.indexOf('|');
+			int v1 = indexForName(t.substring(0,pipe));
+			int v2 = indexForName(t.substring(pipe+1));
+			adjLists[v1].neighbors = new Neighbor(v2, adjLists[v1].neighbors);
+			adjLists[v2].neighbors = new Neighbor(v1, adjLists[v2].neighbors);
+		}
+	
 	}
+	
+	int indexForName(String name){
+		for(int i=0; i<vertices.length; i++){
+			if(vertices[i].equals(name))
+				return i;
+		}
+		return -1;
+	}
+		
 
 	class Neighbor{
 		public int vnum;
