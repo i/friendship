@@ -14,7 +14,7 @@ public class Graph {
 
 	public Graph(Scanner sc) {
 		this.vertices = new Vertex[Integer.parseInt(sc.nextLine().trim())];
-		Hashtable<String , Integer>  hash = new Hashtable<String, Integer>(this.vertices.length);
+		this.hash = new Hashtable<String, Integer>(this.vertices.length);
 		
 		//Creates vertex for each student and fills 'vertices' array
 		for(int i=0; i<vertices.length; i++){
