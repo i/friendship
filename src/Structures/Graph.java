@@ -8,22 +8,22 @@ public class Graph {
 
 	int size;  //number of edges
 	int edges;
-	Vertex[] vertices;
+	Person[] people;
 	Hashtable<String , Integer>  hash;
 	
 
 	public Graph(Scanner sc) {
-		this.vertices = new Vertex[Integer.parseInt(sc.nextLine().trim())];
-		this.hash = new Hashtable<String, Integer>(this.vertices.length);
+		this.people = new Person[Integer.parseInt(sc.nextLine().trim())];
+		this.hash = new Hashtable<String, Integer>(this.people.length);
 		
-		//Creates vertex for each student and fills 'vertices' array
-		for(int i=0; i<vertices.length; i++){
+		//Creates vertex for each student and fills 'people' array
+		for(int i=0; i<people.length; i++){
 			String t = sc.nextLine().trim();
 			if(t.charAt(t.indexOf('|')+1) == 'y'){
-				vertices[i] = new Vertex(t.substring(0, t.indexOf('|')),  
+				people[i] = new Person(t.substring(0, t.indexOf('|')),  
 						t.substring((t.indexOf('|'))+3, t.length()), null);
 			}
-			else{vertices[i] = new Vertex(t.substring(0, t.indexOf('|')), null, null);}
+			else{people[i] = new Person(t.substring(0, t.indexOf('|')), null, null);}
 			hash.put(t.substring(0, t.indexOf('|')), i);
 		}
 		
@@ -35,8 +35,8 @@ public class Graph {
 			int v1 = indexForName(t.substring(0,pipe));
 			int v2 = indexForName(t.substring(pipe+1));
 			
-			vertices[v1].neighbors = new Neighbor(v2, vertices[v1].neighbors);
-			vertices[v2].neighbors = new Neighbor(v1, vertices[v2].neighbors);
+			people[v1].friends = new Friend(v2, people[v1].friends);
+			people[v2].friends = new Friend(v1, people[v2].friends);
 
 			System.out.println(nameForIndex(v1) + " is now friends with " + nameForIndex(v2)+'.');
 			edges++;
@@ -45,7 +45,7 @@ public class Graph {
 	}
 	
 	String nameForIndex(int index){
-		return vertices[index].name;
+		return people[index].name;
 	}
 	
 	int indexForName(String name){
@@ -53,24 +53,24 @@ public class Graph {
 	}
 		
 
-	class Neighbor{
+	class Friend{
 		public int vnum;
-		public Neighbor next;
-		public Neighbor(int vnum, Neighbor nbr){
+		public Friend next;
+		public Friend(int vnum, Friend nbr){
 			this.vnum = vnum;
 			next = nbr;
 		}
 	}
 
-	public class Vertex {
+	public class Person {
 		String name;	
 		String school;
-		Neighbor neighbors;
+		Friend friends;
 		
-		public Vertex(String name, String school, Neighbor neighbors ) {
+		public Person(String name, String school, Friend friends ) {
 			this.name = name;
 			this.school = school;
-			this.neighbors = neighbors;
+			this.friends = friends;
 		}
 	}
 	
@@ -92,49 +92,49 @@ public class Graph {
 	 *  Greedy Algorithm maybe?
 	 */	
 	public void shortestChain(String sName, String eName){
-		
-		int[] distance = new int[vertices.length];
-		Vertex vsource	= vertices[indexForName(sName)];
-		Vertex vend		= vertices[indexForName(eName)];
-		ArrayList<Vertex> 	seen	= new ArrayList<Vertex>(vertices.length);
-		ArrayList<Vertex> 	unseen	= new ArrayList<Vertex>(vertices.length);
-		ArrayList<Vertex> 	done	= new ArrayList<Vertex>(vertices.length);
-		ArrayList<Neighbor> fringe	= new ArrayList<Neighbor>(vertices.length);
-		
-		// step 1 - Put all vertices in unseen
-		for(Vertex v : unseen)
-			{unseen.add(v);}
-		
-		// step 2 - transfer vsource to done
-		unseen.remove(vsource);
-		done.add(vsource);
-		
-		// step 3 - 
-		Neighbor neighborPTR = vsource.neighbors;
-		for(Neighbor w = vsource.neighbors; w != null; w = w.next){
-			fringe.add(w);
-			distance[w.vnum]++;
-		}
-		
+
+		//OLD SHORTEST CHAIN METHOD
+//		int[] distance = new int[people.length];
+//		Person vsource	= people[indexForName(sName)];
+//		Person vend		= people[indexForName(eName)];
+//		ArrayList<Person> 	seen	= new ArrayList<Person>(people.length);
+//		ArrayList<Person> 	unseen	= new ArrayList<Person>(people.length);
+//		ArrayList<Person> 	done	= new ArrayList<Person>(people.length);
+//		ArrayList<Friend> fringe	= new ArrayList<Friend>(people.length);
+//		
+//		// step 1 - Put all people in unseen
+//		for(Person v : unseen)
+//			{unseen.add(v);}
+//		
+//		// step 2 - transfer vsource to done
+//		unseen.remove(vsource);
+//		done.add(vsource);
+//		
+//		// step 3 - 
+//		Friend friendsPTR = vsource.friends;
+//		for(Friend w = vsource.friends; w != null; w = w.next){
+//			fringe.add(w);
+//			distance[w.vnum]++;
+//		}
+//		
 	}
-	
 	
 	/**
 	 * Prints a textual representation of the graph
 	 */
 	public void printGraph(){
-		System.out.println(vertices.length);
-		for(int v = 0; v < vertices.length; v++){
-			if(vertices[v].school != null)
-				System.out.println(vertices[v].name + "|y|" + vertices[v].school);
+		System.out.println(people.length);
+		for(int v = 0; v < people.length; v++){
+			if(people[v].school != null)
+				System.out.println(people[v].name + "|y|" + people[v].school);
 			else{
-				System.out.println(vertices[v].name + "|n");
+				System.out.println(people[v].name + "|n");
 			}
 		}
-		for(int v = 0; v < vertices.length; v++){
-			Neighbor ptr = vertices[v].neighbors;
+		for(int v = 0; v < people.length; v++){
+			Friend ptr = people[v].friends;
 			while(ptr != null){
-				System.out.println(vertices[v].name + "|" + nameForIndex(ptr.vnum));
+				System.out.println(people[v].name + "|" + nameForIndex(ptr.vnum));
 				ptr = ptr.next;
 			}
 			
@@ -145,13 +145,13 @@ public class Graph {
 	 * depth first search... what else?
 	 */
 	public void dfs() {
-		boolean[] visited = new boolean[vertices.length];
+		boolean[] visited = new boolean[people.length];
 		for (int v=0; v < visited.length; v++) {
 			visited[v] = false;
 		}
 		for (int v=0; v < visited.length; v++) {
 			if (!visited[v]) {
-				System.out.println("Starting at " + vertices[v].name);
+				System.out.println("Starting at " + people[v].name);
 				dfs(v, visited);
 			}
 		}
@@ -160,10 +160,10 @@ public class Graph {
 	// recursive DFS
 	private void dfs(int v, boolean[] visited) {
 		visited[v] = true;
-		System.out.println("visiting " + vertices[v].name);
-		for (Neighbor e=vertices[v].neighbors; e != null; e=e.next) {
+		System.out.println("visiting " + people[v].name);
+		for (Friend e=people[v].friends; e != null; e=e.next) {
 			if (!visited[e.vnum]) {
-				System.out.println(vertices[v].name + "--" + vertices[e.vnum].name);
+				System.out.println(people[v].name + "--" + people[e.vnum].name);
 				dfs(e.vnum, visited);
 			}
 		}
