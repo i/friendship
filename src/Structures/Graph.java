@@ -49,11 +49,6 @@ public class Graph {
 
 	}
 	
-	public Graph subgraph(Graph graph, String school){
-		
-		return null;
-	}
-	
 	String nameForIndex(int index){
 		return people.get(index).name;
 	}

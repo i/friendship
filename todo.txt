@@ -1,0 +1,11 @@
+todo:
+shortest path
+connected islands (cliques)
+connectors
+
+completed:
+interface
+build
+subgraph
+
+**efficiency**
