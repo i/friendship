@@ -4,10 +4,13 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Scanner; 
 
+import Structures.Graph.Friend;
+
 public class Graph {
 
 	int size;  //number of edges
-	int edges;
+	int numEdges;
+	ArrayList<Edge> edges;
 	Person[] people;
 	Hashtable<String , Integer>  hash;
 	
@@ -15,6 +18,7 @@ public class Graph {
 	public Graph(Scanner sc) {
 		this.people = new Person[Integer.parseInt(sc.nextLine().trim())];
 		this.hash = new Hashtable<String, Integer>(this.people.length);
+		this.edges = new ArrayList<Edge>();
 		
 		//Creates vertex for each student and fills 'people' array
 		for(int i=0; i<people.length; i++){
@@ -37,11 +41,12 @@ public class Graph {
 			
 			people[v1].friends = new Friend(v2, people[v1].friends);
 			people[v2].friends = new Friend(v1, people[v2].friends);
+			edges.add(new Edge(v1, v2));
 
 			System.out.println(nameForIndex(v1) + " is now friends with " + nameForIndex(v2)+'.');
-			edges++;
+			numEdges++;
 		}
-	
+
 	}
 	
 	String nameForIndex(int index){
@@ -51,14 +56,24 @@ public class Graph {
 	int indexForName(String name){
 		return hash.get(name);
 	}
+	
+	class Edge{
+		public int v1;
+		public int v2;
+		public Edge(int v1, int v2){
+			this.v1 = v1;
+			this.v2 = v2;
+		}
+	}
 		
 
 	class Friend{
-		public int vnum;
-		public Friend next;
-		public Friend(int vnum, Friend nbr){
-			this.vnum = vnum;
-			next = nbr;
+		public int index;
+		public Friend friend;
+		public Friend possiblefriends;
+		public Friend(int index, Friend friend){
+			this.index = index;
+			this.friend = friend;
 		}
 	}
 
@@ -75,15 +90,32 @@ public class Graph {
 	}
 	
 
-
 	/**
 	 * Makes a graph consisting only of the students at a certain school.
 	 * Prints the graph in the same format as input file.
 	 * 
 	 */	
-	public String atSchool(String school){
+	public Person[] subgraph(String school){
+		ArrayList<Integer> studentnums = new ArrayList<Integer>();
+		for (Person p : people){
+			if(p.school == school){
+				studentnums.add(indexForName(p.name));
+			}
+		}
+		
+		Person[] students = new Person[studentnums.size()];
+		for (int i=0; i<students.length; i++){
+			Friend possiblefriends = people[i].friends;
+			Friend schoolFriends;
+			while(possiblefriends!=null){
+				if(people[possiblefriends.index].school.equals(school)){
+					schoolFriends.friend = new Friend(index, friend)
+				}
+				possiblefriends = possiblefriends.friend;
+			}
+			Person p = new Person(nameForIndex(studentnums.get(i)), school, friends)
+		}
 		return null;
-	
 	}
 
 	/**
@@ -91,32 +123,13 @@ public class Graph {
 	 *  Prints the sequence of names.
 	 *  Greedy Algorithm maybe?
 	 */	
-	public void shortestChain(String sName, String eName){
+	public void shortestChain(String source, String end){
+		ArrayList<Person> unseen = new ArrayList<Person>();
+		ArrayList<Person> done   = new ArrayList<Person>();
+		
+		
 
-		//OLD SHORTEST CHAIN METHOD
-//		int[] distance = new int[people.length];
-//		Person vsource	= people[indexForName(sName)];
-//		Person vend		= people[indexForName(eName)];
-//		ArrayList<Person> 	seen	= new ArrayList<Person>(people.length);
-//		ArrayList<Person> 	unseen	= new ArrayList<Person>(people.length);
-//		ArrayList<Person> 	done	= new ArrayList<Person>(people.length);
-//		ArrayList<Friend> fringe	= new ArrayList<Friend>(people.length);
-//		
-//		// step 1 - Put all people in unseen
-//		for(Person v : unseen)
-//			{unseen.add(v);}
-//		
-//		// step 2 - transfer vsource to done
-//		unseen.remove(vsource);
-//		done.add(vsource);
-//		
-//		// step 3 - 
-//		Friend friendsPTR = vsource.friends;
-//		for(Friend w = vsource.friends; w != null; w = w.next){
-//			fringe.add(w);
-//			distance[w.vnum]++;
-//		}
-//		
+		
 	}
 	
 	/**
@@ -134,8 +147,8 @@ public class Graph {
 		for(int v = 0; v < people.length; v++){
 			Friend ptr = people[v].friends;
 			while(ptr != null){
-				System.out.println(people[v].name + "|" + nameForIndex(ptr.vnum));
-				ptr = ptr.next;
+				System.out.println(people[v].name + "|" + nameForIndex(ptr.index));
+				ptr = ptr.friend;
 			}
 			
 		}
@@ -161,10 +174,10 @@ public class Graph {
 	private void dfs(int v, boolean[] visited) {
 		visited[v] = true;
 		System.out.println("visiting " + people[v].name);
-		for (Friend e=people[v].friends; e != null; e=e.next) {
-			if (!visited[e.vnum]) {
-				System.out.println(people[v].name + "--" + people[e.vnum].name);
-				dfs(e.vnum, visited);
+		for (Friend e=people[v].friends; e != null; e=e.friend) {
+			if (!visited[e.index]) {
+				System.out.println(people[v].name + "--" + people[e.index].name);
+				dfs(e.index, visited);
 			}
 		}
 	}

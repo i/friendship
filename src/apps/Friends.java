@@ -44,7 +44,8 @@ static Scanner userin = new Scanner(System.in);
 			char option;
 			while((option = getOption()) != 'q'){
 				if(option == '1'){
-					//do the students at school thing
+					System.out.print("Enter school name: ");
+					graph.subgraph(userin.next());
 				}
 				else if(option == '2'){
 					System.out.println("Enter name of person:");
@@ -52,11 +53,13 @@ static Scanner userin = new Scanner(System.in);
 					System.out.println("Enter name of person they want to meet:");
 					String eName = userin.next();
 					graph.shortestChain(sName, eName);
+					
 				}
 				else if(option == '3'){
 					//do the cliques at school thing
 				}
 				else if(option == '4'){
+					graph.dfs();
 					//do connectors
 				}
 				else if(option == '5'){
