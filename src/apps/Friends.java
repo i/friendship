@@ -45,7 +45,7 @@ static Scanner userin = new Scanner(System.in);
 			while((option = getOption()) != 'q'){
 				if(option == '1'){
 					System.out.print("Enter school name: ");
-					graph.atSchool(userin.next());
+					graph.atSchool(userin.nextLine());
 				}
 				else if(option == '2'){
 					System.out.println("Enter name of person:");
