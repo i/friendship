@@ -43,18 +43,18 @@ static Scanner userin = new Scanner(System.in);
 			while((option = getOption()) != 'q'){
 				if(option == '1'){
 					System.out.println("Enter school name: ");
-					String school = userin.nextLine();
-					graph.atSchool(school);
+					graph.atSchool(userin.nextLine().toLowerCase());
 				}
 				else if(option == '2'){
 					System.out.println("Enter name of person:");
-					String sName = userin.nextLine();
+					String sName = userin.nextLine().toLowerCase();
 					System.out.println("Enter name of person they want to meet:");
-					String eName = userin.nextLine();
+					String eName = userin.nextLine().toLowerCase();
 					graph.shortestChain(sName, eName);					
 				}
 				else if(option == '3'){
-					//do the cliques at school thing
+					System.out.println("Enter school name: ");
+					graph.cliques(userin.nextLine().toLowerCase());
 				}
 				else if(option == '4'){
 					graph.dfs();

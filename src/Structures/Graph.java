@@ -22,7 +22,7 @@ public class Graph {
 		
 		//Creates vertex for each student and fills 'people' array
 		for(int i=0; i<this.size; i++){
-			String t = sc.nextLine().trim();
+			String t = sc.nextLine().trim().toLowerCase();
 			if (t.charAt(t.indexOf('|')+1) == 'y'){
 				people.add(new Person(t.substring(0, t.indexOf('|')),  
 						t.substring((t.indexOf('|'))+3, t.length()), null));
@@ -34,7 +34,7 @@ public class Graph {
 		}
 		//reads edges
 		while(sc.hasNextLine()){
-			String t = sc.nextLine().trim();
+			String t = sc.nextLine().trim().toLowerCase();
 			int pipe = t.indexOf('|');
 			int v1 = indexForName(t.substring(0,pipe));
 			int v2 = indexForName(t.substring(pipe+1));
@@ -66,45 +66,42 @@ public class Graph {
 		}
 	}
 		
-
+	public class Person {
+		String name;	
+		String school;
+		Friend friends;
+		int dfsnum;
+		int back;
+		
+		public Person(String name, String school, Friend friends ) {
+			this.name = name;
+			this.school = school;
+			this.friends = friends;
+			this.dfsnum = 0;
+			this.back = 0;
+		}
+	}
+	
 	class Friend{
 		public int index; 
 		public Friend next;
 		public Friend possiblefriends;
 		public String name;
 		public String school;
-		
+	
 		public Friend(int index, Friend next){
 			this.index = index;
 			this.next = next;
 			this.school = people.get(index).school;
 			this.name = people.get(index).name;
-		}
-		
-		public Friend add(Friend newfriend, Friend old){
-			if(this == null){
-				return newfriend;
-			}
-			newfriend.next = old;
-			return newfriend;
-		}
+		}		
 	}
 	
 	public static void add(Friend newf, Friend old){
 		newf.next = old;
 	}
 
-	public class Person {
-		String name;	
-		String school;
-		Friend friends;
-		
-		public Person(String name, String school, Friend friends ) {
-			this.name = name;
-			this.school = school;
-			this.friends = friends;
-		}
-	}
+
 	
 
 	/**
@@ -168,10 +165,6 @@ public class Graph {
 			}
 		}
 		
-		
-		
-
-		
 	}
 	
 	/**
@@ -201,25 +194,29 @@ public class Graph {
 	 * depth first search... what else?
 	 */
 	public void dfs() {
+		int dfsnum = 1;
 		boolean[] visited = new boolean[people.size()];
-		for (int v=0; v < visited.length; v++) {
+		for (int v = 0; v < visited.length; v++) {
 			visited[v] = false;
 		}
-		for (int v=0; v < visited.length; v++) {
+		for (int v = 0; v < visited.length; v++) {
 			if (!visited[v]) {
 				System.out.println("Starting at " + people.get(v).name);
-				dfs(v, visited);
+				dfs(v, visited, 1);
 			}
 		}
 	}
 	// recursive DFS
-	private void dfs(int v, boolean[] visited) {
+	private void dfs(int v, boolean[] visited, int dfsnum) {
 		visited[v] = true;
+		people.get(v).dfsnum = dfsnum;		dfsnum++;
 		System.out.println("visiting " + people.get(v).name);
+		
+		
 		for (Friend e=people.get(v).friends; e != null; e=e.next) {
 			if (!visited[e.index]) {
 				System.out.println(people.get(v).name + "--" + people.get(e.index).name);
-				dfs(e.index, visited);
+				dfs(e.index, visited, dfsnum);
 			}
 		}
 	}
@@ -227,9 +224,12 @@ public class Graph {
 	 * finds cliques (separate groups) at a particular school.
 	 * prints the subgraphs in format of input file.
 	 */
-	public String cliques(String school){
-		return null;
-		
+	public void cliques(String school){
+		int numcliques = 0;
+		for(int i=0; i<numcliques; i++){
+			System.out.println("Clique " + i + ": ");
+			
+		}
 	}
 
 	/**
