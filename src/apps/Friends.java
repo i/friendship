@@ -19,10 +19,10 @@ static Scanner userin = new Scanner(System.in);
 		System.out.print("\t4) Connectors\n");
 		System.out.print("\t5) Print\n");
 		System.out.print("\tq) Quit\n");
-		char response = userin.next().toLowerCase().charAt(0);
+		char response = userin.nextLine().toLowerCase().charAt(0);
 		while (response != '1' && response != '2' && response != '3' && response != '4' && response != '5' && response != 'q') {
 			System.out.print("\tYou must enter one of 1, 2, 3, 4, 5, or q! ");
-			response = userin.next().toLowerCase().charAt(0);
+			response = userin.nextLine().toLowerCase().charAt(0);
 		}
 		return response;
 	}
@@ -34,26 +34,24 @@ static Scanner userin = new Scanner(System.in);
 	public static void main(String[] args) throws FileNotFoundException {
 		// TODO Auto-generated method stub
 		System.out.println("Enter graph file name: ");
-		String graphFile = userin.next();
+		String graphFile = userin.nextLine();
 		Graph graph;
 //		try{
 			graph = new Graph(new Scanner(new File(graphFile)));
 
-		
-
 			char option;
 			while((option = getOption()) != 'q'){
 				if(option == '1'){
-					System.out.print("Enter school name: ");
-					graph.atSchool(userin.nextLine());
+					System.out.println("Enter school name: ");
+					String school = userin.nextLine();
+					graph.atSchool(school);
 				}
 				else if(option == '2'){
 					System.out.println("Enter name of person:");
-					String sName = userin.next();
+					String sName = userin.nextLine();
 					System.out.println("Enter name of person they want to meet:");
-					String eName = userin.next();
-					graph.shortestChain(sName, eName);
-					
+					String eName = userin.nextLine();
+					graph.shortestChain(sName, eName);					
 				}
 				else if(option == '3'){
 					//do the cliques at school thing
