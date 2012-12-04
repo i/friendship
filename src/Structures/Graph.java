@@ -202,23 +202,25 @@ public class Graph {
 		for (int v = 0; v < visited.length; v++) {
 			if (!visited[v]) {
 				System.out.println("Starting at " + people.get(v).name);
-				dfs(v, visited, 1);
+				dfsnum = dfs(v, visited, dfsnum);
 			}
 		}
 	}
 	// recursive DFS
-	private void dfs(int v, boolean[] visited, int dfsnum) {
+	private int  dfs(int v, boolean[] visited, int dfsnum) {
 		visited[v] = true;
-		people.get(v).dfsnum = dfsnum;		dfsnum++;
-		System.out.println("visiting " + people.get(v).name);
+		people.get(v).dfsnum = v; dfsnum++;		
+		System.out.println("visiting " + people.get(v).name + " num: " + people.get(v).dfsnum);
 		
-		
-		for (Friend e=people.get(v).friends; e != null; e=e.next) {
-			if (!visited[e.index]) {
-				System.out.println(people.get(v).name + "--" + people.get(e.index).name);
-				dfs(e.index, visited, dfsnum);
+		// v: current person
+		// e: current friend
+		for (Friend curr=people.get(v).friends; curr != null; curr=curr.next) {
+			if (!visited[curr.index]) {
+				System.out.println(people.get(v).name + "--" + people.get(curr.index).name);
+				dfs(curr.index, visited, dfsnum);
 			}
 		}
+		return dfsnum;
 	}
 	/**
 	 * finds cliques (separate groups) at a particular school.
