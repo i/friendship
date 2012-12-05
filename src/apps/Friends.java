@@ -57,7 +57,7 @@ static Scanner userin = new Scanner(System.in);
 					graph.cliques(userin.nextLine().toLowerCase());
 				}
 				else if(option == '4'){
-					graph.dfs();
+					graph.connectors();
 					//do connectors
 				}
 				else if(option == '5'){

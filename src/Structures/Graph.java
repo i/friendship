@@ -12,6 +12,7 @@ public class Graph {
 	ArrayList<Edge> edges;
 	ArrayList<Person> people;
 	Hashtable<String , Integer>  hash;
+	int dfscount;
 	
 
 	public Graph(Scanner sc) {
@@ -19,6 +20,7 @@ public class Graph {
 		this.people = new ArrayList<Person>(this.size);
 		this.hash = new Hashtable<String, Integer>(this.size);
 		this.edges = new ArrayList<Edge>();
+		this.dfscount = 1;
 		
 		//Creates vertex for each student and fills 'people' array
 		for(int i=0; i<this.size; i++){
@@ -44,7 +46,6 @@ public class Graph {
 			edges.add(new Edge(people.get(v1), people.get(v2)));
 
 			System.out.println(nameForIndex(v1) + " is now friends with " + nameForIndex(v2)+'.');
-			
 		}
 
 	}
@@ -95,14 +96,7 @@ public class Graph {
 			this.school = people.get(index).school;
 			this.name = people.get(index).name;
 		}		
-	}
-	
-	public static void add(Friend newf, Friend old){
-		newf.next = old;
-	}
-
-
-	
+	}	
 
 	/**
 	 * Makes a graph consisting only of the students at a certain school.
@@ -111,7 +105,6 @@ public class Graph {
 	 */	
 	public ArrayList<Person> atSchool(String schoolName){
 		ArrayList<Person> students = new ArrayList<Person>();
-		
 		for (int i = 0; i < people.size(); i++){			
 			if(people.get(i).school != null && people.get(i).school.equals(schoolName)){
 				Person temp = new Person(people.get(i).name, schoolName, null);
@@ -127,7 +120,6 @@ public class Graph {
 				students.add(temp);		
 			}
 		}
-		
 		for(Person p : students){System.out.println(p.name + "|y|" + p.school);}
 		
 		for(int v = 0; v < students.size(); v++){
@@ -137,7 +129,6 @@ public class Graph {
 				ptr = ptr.next;
 			}
 		}
-		
 		return students;
 	}
 
@@ -147,23 +138,7 @@ public class Graph {
 	 *  Greedy Algorithm maybe?
 	 */	
 	public void shortestChain(String source, String end){
-		Person vsource = people.get(indexForName(source));
-		Person vend    = people.get(indexForName(end));
-		int [] distance = new int[people.size()];
-		ArrayList<Person> seen   = new ArrayList<Person>();
-		ArrayList<Person> unseen = new ArrayList<Person>();
-		ArrayList<Person> done   = new ArrayList<Person>();
-		ArrayList<Friend> fringe = new ArrayList<Friend>();
 		
-		for(Person p : people){unseen.add(p);}	 	//step 1. put all vertices in unseen
-		unseen.remove(vsource); done.add(vsource);  //step 2. transfer vsource to done
-		for(Friend w = vsource.friends; w != null; w = w.next){
-			fringe.add(w); 							//step 3. for each neighbor, put w into fringe
-			distance[w.index]++;
-			while(!fringe.isEmpty()){
-				
-			}
-		}
 		
 	}
 	
@@ -193,35 +168,20 @@ public class Graph {
 	/**
 	 * depth first search... what else?
 	 */
-	public void dfs() {
-		int dfsnum = 1;
-		boolean[] visited = new boolean[people.size()];
-		for (int v = 0; v < visited.length; v++) {
-			visited[v] = false;
-		}
-		for (int v = 0; v < visited.length; v++) {
-			if (!visited[v]) {
-				System.out.println("Starting at " + people.get(v).name);
-				dfsnum = dfs(v, visited, dfsnum);
-			}
-		}
-	}
+//	public void dfs() {
+//		boolean[] visited = new boolean[people.size()];
+//		for (int v = 0; v < visited.length; v++) {
+//			visited[v] = false;
+//		}
+//		for (int v = 0; v < visited.length; v++) {
+//			if (!visited[v]) {
+//				System.out.println("Starting at " + people.get(v).name);
+//				dfs(v, visited);
+//			}
+//		}
+//	}
 	// recursive DFS
-	private int  dfs(int v, boolean[] visited, int dfsnum) {
-		visited[v] = true;
-		people.get(v).dfsnum = v; dfsnum++;		
-		System.out.println("visiting " + people.get(v).name + " num: " + people.get(v).dfsnum);
-		
-		// v: current person
-		// e: current friend
-		for (Friend curr=people.get(v).friends; curr != null; curr=curr.next) {
-			if (!visited[curr.index]) {
-				System.out.println(people.get(v).name + "--" + people.get(curr.index).name);
-				dfs(curr.index, visited, dfsnum);
-			}
-		}
-		return dfsnum;
-	}
+
 	/**
 	 * finds cliques (separate groups) at a particular school.
 	 * prints the subgraphs in format of input file.
@@ -238,8 +198,54 @@ public class Graph {
 	 * finds and prints the names of all people who are connectors
 	 * separated by commas, in any order.
 	 */
-	public String connectors(){
-		return null;
+	
+	public void connectors(){
+		boolean[] cons = new boolean[people.size()];
+		boolean[] visited = new boolean[people.size()];
+		
+		
+		for (int v = 0; v < visited.length; v++) {
+			if (!visited[v]) {
+				System.out.println("starting dfs again");
+				dfs(v, visited, cons);
+			}
+		}
+		System.out.println("Connectors:");
+		for(int i=0; i<cons.length; i++){
+			if(cons[i]){
+				System.out.println(people.get(i).name);
+			}
+		}
 	}
+	private void  dfs(int v, boolean[] visited, boolean[] cons) {
+		visited[v] = true;
+		people.get(v).dfsnum = dfscount;	people.get(v).back = dfscount;
+		dfscount++;
+		System.out.println("visiting " + people.get(v).name + " num: " + people.get(v).dfsnum);
 
+		for (Friend w = people.get(v).friends; w != null; w=w.next) {
+			if (!visited[w.index]) {
+				System.out.println(people.get(v).name + "--" + people.get(w.index).name);
+				dfs(w.index, visited, cons);
+				if(people.get(v).dfsnum > people.get(w.index).back) {
+					people.get(v).back = Math.min(people.get(v).back , people.get(w.index).back);
+				}
+				else{
+					if(people.get(v).dfsnum != 1){
+						cons[v] = true; System.out.println(people.get(v).name + " is a connector.");
+					}
+					else{
+						System.out.println("!!!!!!!!!!!!!!!"+ people.get(v).name);
+					}
+				}
+			}
+			else{//w is already visited
+				people.get(v).back = Math.min(people.get(w.index).back, people.get(v).dfsnum);
+				System.out.println(people.get(w.index).name+" is visited. making " + people.get(v).name + "'s back: "
+							+ Math.min(people.get(w.index).back, people.get(v).dfsnum));
+			}	
+		}
+			
+	}
+	
 }
