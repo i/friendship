@@ -8,8 +8,7 @@ import Structures.Graph.Friend;
 
 public class Graph {
 
-	int size;  //number of edges
-	ArrayList<Edge> edges;
+	int size;  //number of vertices
 	ArrayList<Person> people;
 	Hashtable<String , Integer>  hash;
 	int dfscount;
@@ -19,7 +18,6 @@ public class Graph {
 		this.size = Integer.parseInt(sc.nextLine().trim());
 		this.people = new ArrayList<Person>(this.size);
 		this.hash = new Hashtable<String, Integer>(this.size);
-		this.edges = new ArrayList<Edge>();
 		this.dfscount = 1;
 		
 		//Creates vertex for each student and fills 'people' array
@@ -43,11 +41,19 @@ public class Graph {
 			
 			people.get(v1).friends = new Friend(v2, people.get(v1).friends);
 			people.get(v2).friends = new Friend(v1, people.get(v2).friends);
-			edges.add(new Edge(people.get(v1), people.get(v2)));
 
 			System.out.println(nameForIndex(v1) + " is now friends with " + nameForIndex(v2)+'.');
 		}
 
+	}
+	
+	//alternate graph constructor -- takes in arraylist instead of scanner
+	public Graph (ArrayList<Person> people){
+		this.people = people;
+		this.hash = new Hashtable<String, Integer>(this.people.size());
+		for(int i = 0; i<people.size(); i++) {
+			hash.put(people.get(i).name, i);
+		}
 	}
 	
 	String nameForIndex(int index){
@@ -99,11 +105,12 @@ public class Graph {
 	}	
 
 	/**
-	 * Makes a graph consisting only of the students at a certain school.
+	 * Makes a graph knexisting only of the students at a certain school.
 	 * Prints the graph in the same format as input file.
 	 * 
 	 */	
-	public ArrayList<Person> atSchool(String schoolName){
+	public Graph atSchool(String schoolName){
+		Graph subgraph;
 		ArrayList<Person> students = new ArrayList<Person>();
 		for (int i = 0; i < people.size(); i++){			
 			if(people.get(i).school != null && people.get(i).school.equals(schoolName)){
@@ -129,7 +136,9 @@ public class Graph {
 				ptr = ptr.next;
 			}
 		}
-		return students;
+		subgraph = new Graph(students);
+		return subgraph;
+		
 	}
 
 	/**
@@ -187,11 +196,17 @@ public class Graph {
 	 * prints the subgraphs in format of input file.
 	 */
 	public void cliques(String school){
-		int numcliques = 0;
-		for(int i=0; i<numcliques; i++){
-			System.out.println("Clique " + i + ": ");
+		Graph subgraph = atSchool(school);
+		ArrayList<Graph> cliques = new ArrayList<Graph>();
+		boolean[] visited = new boolean[subgraph.size];
+		for(int i=0; i<subgraph.size; i++){
+			if (!visited[i]){
+				System.out.println("starting on new clique");
+				
+			}
 			
 		}
+		
 	}
 
 	/**
@@ -200,49 +215,47 @@ public class Graph {
 	 */
 	
 	public void connectors(){
-		boolean[] cons = new boolean[people.size()];
-		boolean[] visited = new boolean[people.size()];
+		boolean[] knex = new boolean[size];
+		boolean[] visited = new boolean[size];
 		
 		
 		for (int v = 0; v < visited.length; v++) {
 			if (!visited[v]) {
 				System.out.println("starting dfs again");
-				dfs(v, visited, cons);
+				dfs(v, visited, knex);
 			}
 		}
 		System.out.println("Connectors:");
-		for(int i=0; i<cons.length; i++){
-			if(cons[i]){
+		for(int i=0; i<knex.length; i++){
+			if(knex[i]){
 				System.out.println(people.get(i).name);
 			}
 		}
 	}
-	private void  dfs(int v, boolean[] visited, boolean[] cons) {
+	private void  dfs(int v, boolean[] visited, boolean[] knex) {
 		visited[v] = true;
 		people.get(v).dfsnum = dfscount;	people.get(v).back = dfscount;
 		dfscount++;
-		System.out.println("visiting " + people.get(v).name + " num: " + people.get(v).dfsnum);
+		System.out.println("Visiting " + people.get(v).name + " num: " + people.get(v).dfsnum);
 
 		for (Friend w = people.get(v).friends; w != null; w=w.next) {
 			if (!visited[w.index]) {
-				System.out.println(people.get(v).name + "--" + people.get(w.index).name);
-				dfs(w.index, visited, cons);
+				dfs(w.index, visited, knex);
 				if(people.get(v).dfsnum > people.get(w.index).back) {
 					people.get(v).back = Math.min(people.get(v).back , people.get(w.index).back);
 				}
 				else{
 					if(people.get(v).dfsnum != 1){
-						cons[v] = true; System.out.println(people.get(v).name + " is a connector.");
+						knex[v] = true; System.out.println(people.get(v).name + " is a connector.");
 					}
 					else{
-						System.out.println("!!!!!!!!!!!!!!!"+ people.get(v).name);
+						System.out.println(people.get(v).name + " is starting point. NOT a connector!");
 					}
 				}
 			}
 			else{//w is already visited
 				people.get(v).back = Math.min(people.get(w.index).back, people.get(v).dfsnum);
-				System.out.println(people.get(w.index).name+" is visited. making " + people.get(v).name + "'s back: "
-							+ Math.min(people.get(w.index).back, people.get(v).dfsnum));
+				System.out.println(people.get(w.index).name + " " + people.get(w.index).dfsnum + "/" + people.get(w.index).back);
 			}	
 		}
 			
