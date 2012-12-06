@@ -1,7 +1,8 @@
 todo:
-shortest path
-connected islands (cliques)
-connectors
+shortest path (liz)
+connected islands (cliques) started?
+connectors 70% done
+fix atschool
 
 completed:
 interface

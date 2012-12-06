@@ -43,7 +43,8 @@ static Scanner userin = new Scanner(System.in);
 			while((option = getOption()) != 'q'){
 				if(option == '1'){
 					System.out.println("Enter school name: ");
-					graph.atSchool(userin.nextLine().toLowerCase());
+					Graph school = graph.atSchool(userin.nextLine().toLowerCase());
+					school.printGraph();
 				}
 				else if(option == '2'){
 					System.out.println("Enter name of person:");

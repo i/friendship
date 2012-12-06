@@ -49,11 +49,13 @@ public class Graph {
 	
 	//alternate graph constructor -- takes in arraylist instead of scanner
 	public Graph (ArrayList<Person> people){
+		this.size = people.size();
 		this.people = people;
 		this.hash = new Hashtable<String, Integer>(this.people.size());
 		for(int i = 0; i<people.size(); i++) {
 			hash.put(people.get(i).name, i);
 		}
+		this.dfscount = 1;
 	}
 	
 	String nameForIndex(int index){
@@ -62,15 +64,6 @@ public class Graph {
 	
 	int indexForName(String name){
 		return hash.get(name);
-	}
-	
-	class Edge{
-		public Person p1;
-		public Person p2;
-		public Edge(Person p1, Person p2){
-			this.p1 = p1;
-			this.p2 = p2;
-		}
 	}
 		
 	public class Person {
@@ -96,6 +89,13 @@ public class Graph {
 		public String name;
 		public String school;
 	
+		public Friend(String name, Friend next){
+			this.index = indexForName(name);
+			this.name = name;
+			this.school = people.get(index).school;
+			this.next = next;
+		}
+		
 		public Friend(int index, Friend next){
 			this.index = index;
 			this.next = next;
@@ -110,35 +110,40 @@ public class Graph {
 	 * 
 	 */	
 	public Graph atSchool(String schoolName){
-		Graph subgraph;
 		ArrayList<Person> students = new ArrayList<Person>();
+		Graph subgraph = new Graph(students);
+		//adds people with old friends
 		for (int i = 0; i < people.size(); i++){			
 			if(people.get(i).school != null && people.get(i).school.equals(schoolName)){
-				Person temp = new Person(people.get(i).name, schoolName, null);
-				Friend newfriends = null;
-				Friend curr = people.get(i).friends;
-				while(curr != null){
-					if(curr.school != null && curr.school.equals(schoolName)){
-						newfriends = new Friend(curr.index, newfriends);
-					}
-					curr = curr.next;
+				students.add(new Person(people.get(i).name, schoolName, people.get(i).friends));System.out.println("added" +people.get(i).name);;
+				subgraph.hash.put(people.get(i).name, i);System.out.println("hashed" + people.get(i).name + "to value: " + i);
+			}
+		}
+		//deletes old friends and changes index of each
+		for(int i = 0; i<students.size(); i++){
+			Friend curr = students.get(i).friends;
+
+			Friend newfriends = null;
+			while(curr != null){
+				if(people.get(curr.index).school != null && people.get(curr.index).school.equals(schoolName)){
+					newfriends = new Friend(curr.name, newfriends);
+					curr.index = subgraph.indexForName(curr.name);
+					curr = curr.next;					
 				}
-				temp.friends = newfriends;
-				students.add(temp);		
 			}
+			students.get(i).friends = newfriends;
 		}
-		for(Person p : students){System.out.println(p.name + "|y|" + p.school);}
 		
-		for(int v = 0; v < students.size(); v++){
-			Friend ptr = students.get(v).friends;
-			while(ptr != null){
-				System.out.println(students.get(v).name + "|" + nameForIndex(ptr.index));
-				ptr = ptr.next;
-			}
-		}
-		subgraph = new Graph(students);
+//		for(Person p : students){System.out.println(p.name + "|y|" + p.school);}
+//		
+//		for(int v = 0; v < students.size(); v++){
+//			Friend ptr = students.get(v).friends;
+//			while(ptr != null){
+//				System.out.println(students.get(v).name + "|" + nameForIndex(ptr.index));
+//				ptr = ptr.next;
+//			}
+//		}
 		return subgraph;
-		
 	}
 
 	/**
