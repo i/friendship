@@ -1,6 +1,7 @@
 package apps;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 import Structures.Graph;
@@ -55,7 +56,13 @@ static Scanner userin = new Scanner(System.in);
 				}
 				else if(option == '3'){
 					System.out.println("Enter school name: ");
-					graph.cliques(userin.nextLine().toLowerCase());
+					Graph subgraph = graph.atSchool(userin.nextLine().toLowerCase());
+					ArrayList<Graph> cliques = subgraph.cliques();
+					for(int k = 1; k < cliques.size()+1; k++){
+						System.out.println("Clique " + k + ":");
+						cliques.get(k-1).printGraph();
+					}
+					
 				}
 				else if(option == '4'){
 					graph.connectors();

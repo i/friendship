@@ -12,6 +12,7 @@ public class Graph {
 	ArrayList<Person> people;
 	Hashtable<String , Integer>  hash;
 	int dfscount;
+	String schoolname;
 	
 
 	public Graph(Scanner sc) {
@@ -19,6 +20,7 @@ public class Graph {
 		this.people = new ArrayList<Person>(this.size);
 		this.hash = new Hashtable<String, Integer>(this.size);
 		this.dfscount = 1;
+		this.schoolname = null;
 		
 		//Creates vertex for each student and fills 'people' array
 		for(int i=0; i<this.size; i++){
@@ -42,7 +44,7 @@ public class Graph {
 			people.get(v1).friends = new Friend(v2, people.get(v1).friends);
 			people.get(v2).friends = new Friend(v1, people.get(v2).friends);
 
-			System.out.println(nameForIndex(v1) + " is now friends with " + nameForIndex(v2)+'.');
+//			System.out.println(nameForIndex(v1) + " is now friends with " + nameForIndex(v2)+'.');
 		}
 
 	}
@@ -51,11 +53,26 @@ public class Graph {
 	public Graph (ArrayList<Person> people){
 		this.size = people.size();
 		this.people = people;
+		this.schoolname = people.get(0).school;
 		this.hash = new Hashtable<String, Integer>(this.people.size());
 		for(int i = 0; i<people.size(); i++) {
 			hash.put(people.get(i).name, i);
 		}
 		this.dfscount = 1;
+		for(int i = 0; i<this.people.size(); i++){
+			this.hash.put(this.people.get(i).name, i);
+			Friend newfriends = null;
+			Friend ptr = this.people.get(i).friends;
+			while(ptr != null){
+				this.indexForName(ptr.name);		
+				ptr.index = this.indexForName(ptr.name);
+				if(ptr.index != -1){
+					newfriends = new Friend(ptr.index, newfriends);
+				}
+				ptr = ptr.next;
+			}
+			this.people.get(i).friends = newfriends;
+		}
 	}
 	
 	String nameForIndex(int index){
@@ -63,9 +80,13 @@ public class Graph {
 	}
 	
 	int indexForName(String name){
-		return hash.get(name);
+		try{
+			return hash.get(name);
+		}catch(Exception NullPointerException){
+			return -1;
+		}
 	}
-		
+	
 	public class Person {
 		String name;	
 		String school;
@@ -85,7 +106,6 @@ public class Graph {
 	class Friend{
 		public int index; 
 		public Friend next;
-		public Friend possiblefriends;
 		public String name;
 		public String school;
 	
@@ -111,38 +131,14 @@ public class Graph {
 	 */	
 	public Graph atSchool(String schoolName){
 		ArrayList<Person> students = new ArrayList<Person>();
-		Graph subgraph = new Graph(students);
-		//adds people with old friends
-		for (int i = 0; i < people.size(); i++){			
-			if(people.get(i).school != null && people.get(i).school.equals(schoolName)){
-				students.add(new Person(people.get(i).name, schoolName, people.get(i).friends));System.out.println("added" +people.get(i).name);;
-				subgraph.hash.put(people.get(i).name, i);System.out.println("hashed" + people.get(i).name + "to value: " + i);
-			}
-		}
-		//deletes old friends and changes index of each
-		for(int i = 0; i<students.size(); i++){
-			Friend curr = students.get(i).friends;
 
-			Friend newfriends = null;
-			while(curr != null){
-				if(people.get(curr.index).school != null && people.get(curr.index).school.equals(schoolName)){
-					newfriends = new Friend(curr.name, newfriends);
-					curr.index = subgraph.indexForName(curr.name);
-					curr = curr.next;					
-				}
+		for (int i = 0; i < people.size(); i++){			
+			Person p = people.get(i);
+			if(p.school != null && p.school.equals(schoolName)){
+				students.add(new Person(p.name, schoolName, p.friends));
 			}
-			students.get(i).friends = newfriends;
 		}
-		
-//		for(Person p : students){System.out.println(p.name + "|y|" + p.school);}
-//		
-//		for(int v = 0; v < students.size(); v++){
-//			Friend ptr = students.get(v).friends;
-//			while(ptr != null){
-//				System.out.println(students.get(v).name + "|" + nameForIndex(ptr.index));
-//				ptr = ptr.next;
-//			}
-//		}
+		Graph subgraph = new Graph(students);
 		return subgraph;
 	}
 
@@ -172,7 +168,9 @@ public class Graph {
 		for(int v = 0; v < people.size(); v++){
 			Friend ptr = people.get(v).friends;
 			while(ptr != null){
-				System.out.println(people.get(v).name + "|" + nameForIndex(ptr.index));
+				if(v < ptr.index){
+					System.out.println(people.get(v).name + "|" + nameForIndex(ptr.index));
+				}
 				ptr = ptr.next;
 			}
 			
@@ -180,39 +178,40 @@ public class Graph {
 	}
 	
 	/**
-	 * depth first search... what else?
-	 */
-//	public void dfs() {
-//		boolean[] visited = new boolean[people.size()];
-//		for (int v = 0; v < visited.length; v++) {
-//			visited[v] = false;
-//		}
-//		for (int v = 0; v < visited.length; v++) {
-//			if (!visited[v]) {
-//				System.out.println("Starting at " + people.get(v).name);
-//				dfs(v, visited);
-//			}
-//		}
-//	}
-	// recursive DFS
-
-	/**
 	 * finds cliques (separate groups) at a particular school.
 	 * prints the subgraphs in format of input file.
 	 */
-	public void cliques(String school){
-		Graph subgraph = atSchool(school);
-		ArrayList<Graph> cliques = new ArrayList<Graph>();
-		boolean[] visited = new boolean[subgraph.size];
-		for(int i=0; i<subgraph.size; i++){
-			if (!visited[i]){
-				System.out.println("starting on new clique");
-				
-			}
-			
-		}
+	public ArrayList<Graph> cliques(){
+		ArrayList<Graph> cliqueslist = new ArrayList<Graph>();
+		boolean[] visited = new boolean[size];
+		boolean[] vtemp = new boolean[size];
 		
+		for(int i=0; i<size; i++){
+			ArrayList<Person> clique = new ArrayList<Person>();
+			if (!visited[i]){		
+				System.out.println("Starting on new clique");
+				dfs(vtemp, i, visited);
+				for(int j=0; j<visited.length; j++){
+					if(vtemp[j])
+						clique.add(new Person(nameForIndex(j), schoolname, people.get(j).friends));
+						vtemp[j] = false;
+				}
+				Graph tempgraph = new Graph(clique);
+				cliqueslist.add(tempgraph);
+			}
+		}
+		return cliqueslist;
 	}
+	private void dfs(boolean[] newlyVisited, int v, boolean[] visited) {
+		visited[v] = true;
+		newlyVisited[v] = true;
+		for (Friend e=people.get(v).friends; e != null; e=e.next) {
+			if (!visited[e.index]) {
+				dfs(newlyVisited, e.index, visited);
+			}
+		}
+	}
+	
 
 	/**
 	 * finds and prints the names of all people who are connectors
