@@ -202,6 +202,7 @@ public class Graph {
 		}
 		return cliqueslist;
 	}
+	
 	private void dfs(boolean[] newlyVisited, int v, boolean[] visited) {
 		visited[v] = true;
 		newlyVisited[v] = true;
@@ -222,11 +223,20 @@ public class Graph {
 		boolean[] knex = new boolean[size];
 		boolean[] visited = new boolean[size];
 		
-		
 		for (int v = 0; v < visited.length; v++) {
 			if (!visited[v]) {
 				System.out.println("starting dfs again");
 				dfs(v, visited, knex);
+			}
+		}
+		int min = 0;
+		for(int n = people.size()-1; n >= 0; n--){
+			if(people.get(n).back == 1 && n != 0){
+				min++;
+				if(min >= 2){knex[0] = true;}
+			}
+			if(knex[n]){
+				System.out.println(people.get(n).name);
 			}
 		}
 		System.out.println("Connectors:");
@@ -238,7 +248,8 @@ public class Graph {
 	}
 	private void  dfs(int v, boolean[] visited, boolean[] knex) {
 		visited[v] = true;
-		people.get(v).dfsnum = dfscount;	people.get(v).back = dfscount;
+		people.get(v).dfsnum = dfscount;
+		people.get(v).back = dfscount;
 		dfscount++;
 		System.out.println("Visiting " + people.get(v).name + " num: " + people.get(v).dfsnum);
 
@@ -248,21 +259,16 @@ public class Graph {
 				if(people.get(v).dfsnum > people.get(w.index).back) {
 					people.get(v).back = Math.min(people.get(v).back , people.get(w.index).back);
 				}
-				else{
-					if(people.get(v).dfsnum != 1){
-						knex[v] = true; System.out.println(people.get(v).name + " is a connector.");
-					}
-					else{
-						System.out.println(people.get(v).name + " is starting point. NOT a connector!");
-					}
+				if(people.get(v).dfsnum<=people.get(w.index).back && v != 0){
+					knex[v]=true;
 				}
 			}
 			else{//w is already visited
-				people.get(v).back = Math.min(people.get(w.index).back, people.get(v).dfsnum);
+				people.get(v).back = Math.min(people.get(v).back, people.get(w.index).dfsnum);
 				System.out.println(people.get(w.index).name + " " + people.get(w.index).dfsnum + "/" + people.get(w.index).back);
 			}	
 		}
-			
+		
 	}
 	
 }
