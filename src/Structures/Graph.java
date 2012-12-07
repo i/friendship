@@ -1,3 +1,6 @@
+//Ian Lozinski
+//Elizabeth Gao
+
 package Structures;
 
 import java.util.ArrayList;
@@ -12,6 +15,7 @@ public class Graph {
 	ArrayList<Person> people;
 	Hashtable<String , Integer>  hash;
 	int dfscount;
+	int sccount;
 	String schoolname;
 	
 
@@ -20,6 +24,7 @@ public class Graph {
 		this.people = new ArrayList<Person>(this.size);
 		this.hash = new Hashtable<String, Integer>(this.size);
 		this.dfscount = 1;
+		this.sccount = 1;
 		this.schoolname = null;
 		
 		//Creates vertex for each student and fills 'people' array
@@ -51,12 +56,14 @@ public class Graph {
 	
 	//alternate graph constructor -- takes in arraylist instead of scanner
 	public Graph (ArrayList<Person> people){
+		this.dfscount = 1;
+		this.sccount = 1;
 		this.size = people.size();
 		this.people = people;
 		this.schoolname = people.get(0).school;
 		this.hash = new Hashtable<String, Integer>(this.people.size());
 		for(int i = 0; i<people.size(); i++) {
-			hash.put(people.get(i).name, i);
+			this.hash.put(people.get(i).name, i);
 		}
 		this.dfscount = 1;
 		for(int i = 0; i<this.people.size(); i++){
@@ -93,8 +100,10 @@ public class Graph {
 		Friend friends;
 		int dfsnum;
 		int back;
+		int scnum;
 		
 		public Person(String name, String school, Friend friends ) {
+			this.scnum = -1;
 			this.name = name;
 			this.school = school;
 			this.friends = friends;
@@ -147,9 +156,35 @@ public class Graph {
 	 *  Prints the sequence of names.
 	 *  Greedy Algorithm maybe?
 	 */	
-	public void shortestChain(String source, String end){
+	public void shortestChain(String sname, String ename){
+		ArrayList<String> ret = new ArrayList<String>();
+		boolean[] visited = new boolean[size];
 		
+		//for every person, make scnum the min of all neighbors + 1
+		for(int i = 0; i < people.size(); i++){
+			Person p = people.get(i);
+			int min = -1;
+		}
 		
+		scdfs(indexForName(sname), visited);
+		for(Person p : people){if(p.scnum != -1)System.out.println(p.name + p.scnum);}
+			
+	}
+	private void scdfs(int v, boolean[] visited){
+		visited[v] = true;
+		for (Friend e = people.get(v).friends; e != null; e=e.next){
+			if(!visited[e.index]){
+				people.get(e.index).scnum = sccount;
+				sccount++;	System.out.println("visiting " + people.get(e.index).name + ": " + sccount);
+				scdfs(e.index, visited);
+				sccount--;
+				people.get(v).scnum = Math.min(people.get(v).scnum, people.get(e.index).scnum);
+			}
+			else{
+				people.get(e.index).scnum = Math.min(people.get(e.index).scnum, people.get(people.get(v).friends.index).scnum);
+			}
+			
+		}
 	}
 	
 	/**
@@ -190,7 +225,7 @@ public class Graph {
 			ArrayList<Person> clique = new ArrayList<Person>();
 			if (!visited[i]){		
 				System.out.println("Starting on new clique");
-				dfs(vtemp, i, visited);
+				cliquedfs(vtemp, i, visited);
 				for(int j=0; j<visited.length; j++){
 					if(vtemp[j])
 						clique.add(new Person(nameForIndex(j), schoolname, people.get(j).friends));
@@ -203,12 +238,12 @@ public class Graph {
 		return cliqueslist;
 	}
 	
-	private void dfs(boolean[] newlyVisited, int v, boolean[] visited) {
+	private void cliquedfs(boolean[] newlyVisited, int v, boolean[] visited) {
 		visited[v] = true;
 		newlyVisited[v] = true;
 		for (Friend e=people.get(v).friends; e != null; e=e.next) {
 			if (!visited[e.index]) {
-				dfs(newlyVisited, e.index, visited);
+				cliquedfs(newlyVisited, e.index, visited);
 			}
 		}
 	}
@@ -226,7 +261,7 @@ public class Graph {
 		for (int v = 0; v < visited.length; v++) {
 			if (!visited[v]) {
 				System.out.println("starting dfs again");
-				dfs(v, visited, knex);
+				dfscon(v, visited, knex);
 			}
 		}
 		int min = 0;
@@ -245,8 +280,9 @@ public class Graph {
 				System.out.println(people.get(i).name);
 			}
 		}
+		dfscount = 0;
 	}
-	private void  dfs(int v, boolean[] visited, boolean[] knex) {
+	private void  dfscon(int v, boolean[] visited, boolean[] knex) {
 		visited[v] = true;
 		people.get(v).dfsnum = dfscount;
 		people.get(v).back = dfscount;
@@ -255,7 +291,7 @@ public class Graph {
 
 		for (Friend w = people.get(v).friends; w != null; w=w.next) {
 			if (!visited[w.index]) {
-				dfs(w.index, visited, knex);
+				dfscon(w.index, visited, knex);
 				if(people.get(v).dfsnum > people.get(w.index).back) {
 					people.get(v).back = Math.min(people.get(v).back , people.get(w.index).back);
 				}

@@ -1,3 +1,6 @@
+//Ian Lozinski
+//Elizabeth Gao
+
 package apps;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -61,8 +64,7 @@ static Scanner userin = new Scanner(System.in);
 					for(int k = 1; k < cliques.size()+1; k++){
 						System.out.println("Clique " + k + ":");
 						cliques.get(k-1).printGraph();
-					}
-					
+					}					
 				}
 				else if(option == '4'){
 					graph.connectors();
