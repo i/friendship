@@ -55,7 +55,7 @@ public class Graph {
 
 	}
 	
-	//alternate graph constructor -- takes in arraylist instead of scanner
+	//alternate graph constructor -- takes in arrayList instead of scanner
 	public Graph (ArrayList<Person> people){
 		this.dfscount = 1;
 		this.sccount = 1;
@@ -67,8 +67,8 @@ public class Graph {
 			System.out.println("Invalid school name!");
 			return;
 		}
-		this.hash = new Hashtable<String, Integer>(this.people.size());
-		for(int i = 0; i<people.size(); i++) {
+		this.hash = new Hashtable<String, Integer>(this.size);
+		for(int i = 0; i < people.size(); i++) {
 			this.hash.put(people.get(i).name, i);
 		}
 		this.dfscount = 1;
@@ -302,9 +302,6 @@ public class Graph {
 				min++;
 				if(min >= 2){knex[0] = true;}
 			}
-//			if(knex[n]){
-//				System.out.println(people.get(n).name);
-//			}
 		}
 		System.out.print("Connectors:");
 		String s = "";
@@ -314,9 +311,10 @@ public class Graph {
 			}
 		}
 		System.out.println(s);
-		dfscount = 0;
+		dfscount = 1;
 		for(Person p: people){
-//			System.out.println(p.name + " " + p.back);
+			p.dfsnum = 0;
+			p.back = 0;
 		}
 	}
 	private void  dfscon(int v, boolean[] visited, boolean[] knex) {
@@ -326,13 +324,13 @@ public class Graph {
 		dfscount++;
 //		System.out.println("Visiting " + people.get(v).name + " num: " + people.get(v).dfsnum);
 
-		for (Friend w = people.get(v).friends; w != null; w=w.next) {
+		for (Friend w = people.get(v).friends; w != null; w = w.next) {
 			if (!visited[w.index]) {
 				dfscon(w.index, visited, knex);
 				if(people.get(v).dfsnum > people.get(w.index).back) {
 					people.get(v).back = Math.min(people.get(v).back , people.get(w.index).back);
 				}
-				if(people.get(v).dfsnum<=people.get(w.index).back && v != 0){
+				if(people.get(v).dfsnum <= people.get(w.index).back && v != 0){
 					knex[v]=true;
 				}
 			}

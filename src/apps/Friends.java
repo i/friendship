@@ -21,10 +21,9 @@ static Scanner userin = new Scanner(System.in);
 		System.out.print("\t2) Shortest intro chain\n");
 		System.out.print("\t3) Cliques at school\n");
 		System.out.print("\t4) Connectors\n");
-		System.out.print("\t5) Print\n");
 		System.out.print("\tq) Quit\n");
 		char response = userin.nextLine().toLowerCase().charAt(0);
-		while (response != '1' && response != '2' && response != '3' && response != '4' && response != '5' && response != 'q') {
+		while (response != '1' && response != '2' && response != '3' && response != '4' && response != 'q') {
 			System.out.print("\tYou must enter one of 1, 2, 3, 4, 5, or q! ");
 			response = userin.nextLine().toLowerCase().charAt(0);
 		}
@@ -69,9 +68,6 @@ static Scanner userin = new Scanner(System.in);
 				else if(option == '4'){
 					graph.connectors();
 					//do connectors
-				}
-				else if(option == '5'){
-					graph.printGraph();
 				}
 			}
 //		}catch(Exception FileNotFoundException){
