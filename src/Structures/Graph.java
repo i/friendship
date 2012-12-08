@@ -6,6 +6,7 @@ package Structures;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Scanner; 
+import java.util.Stack;
 
 import Structures.Graph.Friend;
 
@@ -134,7 +135,7 @@ public class Graph {
 	}	
 
 	/**
-	 * Makes a graph knexisting only of the students at a certain school.
+	 * Makes a graph consisting only of the students at a certain school.
 	 * Prints the graph in the same format as input file.
 	 * 
 	 */	
@@ -157,6 +158,11 @@ public class Graph {
 	 *  Greedy Algorithm maybe?
 	 */	
 	public void shortestChain(String sname, String ename){
+		if(indexForName(sname) == -1 || indexForName(ename) == -1){
+			System.out.println("invalid name!");
+			return;
+		}
+		Stack<String> chain = new Stack<String>();
 		int snum = indexForName(sname);
 		Person start = people.get(snum);
 		Person end = people.get(indexForName(ename));
@@ -164,9 +170,30 @@ public class Graph {
 		
 		people.get(indexForName(sname)).scnum = 0;
 		scdfs(indexForName(sname), visited);
-			//for(Person p : people){if(p.scnum != -1)System.out.println(p.name + p.scnum);}
-		Friend ptr = end.friends;
-		
+		if(end.scnum == -1){
+			System.out.println("They can NEVER be friends!!!");
+			return;
+		}
+		Person ptr = end;
+		while(ptr.scnum != 0){
+			chain.push(ptr.name);
+			Friend t = ptr.friends;
+			int min = ptr.scnum;
+			while(t != null){
+				if(people.get(t.index).scnum < min){
+					ptr = people.get(t.index);
+					break;
+				}
+				t = t.next;
+			}
+		}
+		chain.push(start.name);
+		String ret = "";
+		while(chain.size() > 1){
+			ret = ret + chain.pop() + ", ";
+		}
+		ret = "Shortest path: " + ret + chain.pop() + ".";
+		System.out.println(ret);
 		
 		//resets scnumbers
 		for(int i = 0; i < people.size(); i++){
@@ -174,6 +201,7 @@ public class Graph {
 		}
 	}
 	private void scdfs(int v, boolean[] visited){
+		System.out.println("here");
 		visited[v] = true;
 		for (Friend e = people.get(v).friends; e != null; e=e.next){
 			if(!visited[e.index]){
