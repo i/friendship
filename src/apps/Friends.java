@@ -40,7 +40,7 @@ static Scanner userin = new Scanner(System.in);
 		System.out.println("Enter graph file name: ");
 		String graphFile = userin.nextLine();
 		Graph graph;
-//		try{
+		try{
 			graph = new Graph(new Scanner(new File(graphFile)));
 
 			char option;
@@ -68,12 +68,12 @@ static Scanner userin = new Scanner(System.in);
 				}
 				else if(option == '4'){
 					graph.connectors();
-					//do connectors
+//					do connectors
 				}
 			}
-//		}catch(Exception FileNotFoundException){
-//			System.err.println("Not valid file! Closing program!");
-//			System.exit(0);
-//		}
+		}catch(Exception FileNotFoundException){
+			System.err.println("Not valid file! Closing program!");
+			
+		}
 	}
 }

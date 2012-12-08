@@ -151,7 +151,15 @@ public class Graph {
 		for (int i = 0; i < people.size(); i++){			
 			Person p = people.get(i);
 			if(p.school != null && p.school.equals(schoolName)){
-				students.add(new Person(p.name, schoolName, p.friends));
+				Friend newfriends = null;
+				Friend temp = p.friends;
+				while(temp != null){
+					if(temp.school != null && temp.school.equals(schoolName)){
+						newfriends = new Friend(temp.index, newfriends);
+					}
+					temp = temp.next;
+				}
+				students.add(new Person(p.name, schoolName, newfriends));
 			}
 		}
 		Graph subgraph = new Graph(students);
