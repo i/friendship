@@ -157,33 +157,36 @@ public class Graph {
 	 *  Greedy Algorithm maybe?
 	 */	
 	public void shortestChain(String sname, String ename){
-		ArrayList<String> ret = new ArrayList<String>();
+		int snum = indexForName(sname);
+		Person start = people.get(snum);
+		Person end = people.get(indexForName(ename));
 		boolean[] visited = new boolean[size];
 		
-		//for every person, make scnum the min of all neighbors + 1
-		for(int i = 0; i < people.size(); i++){
-			Person p = people.get(i);
-			int min = -1;
-		}
-		
+		people.get(indexForName(sname)).scnum = 0;
 		scdfs(indexForName(sname), visited);
-		for(Person p : people){if(p.scnum != -1)System.out.println(p.name + p.scnum);}
-			
+			//for(Person p : people){if(p.scnum != -1)System.out.println(p.name + p.scnum);}
+		Friend ptr = end.friends;
+		
+		
+		//resets scnumbers
+		for(int i = 0; i < people.size(); i++){
+			people.get(i).scnum = -1;
+		}
 	}
 	private void scdfs(int v, boolean[] visited){
 		visited[v] = true;
 		for (Friend e = people.get(v).friends; e != null; e=e.next){
 			if(!visited[e.index]){
 				people.get(e.index).scnum = sccount;
-				sccount++;	System.out.println("visiting " + people.get(e.index).name + ": " + sccount);
+						System.out.println("visiting " + people.get(e.index).name + ": " + sccount);
+				sccount++;	
 				scdfs(e.index, visited);
 				sccount--;
-				people.get(v).scnum = Math.min(people.get(v).scnum, people.get(e.index).scnum);
+				people.get(v).scnum = Math.min(people.get(v).scnum, people.get(e.index).scnum + 1);	
 			}
-			else{
-				people.get(e.index).scnum = Math.min(people.get(e.index).scnum, people.get(people.get(v).friends.index).scnum);
+			else{//already visited
+				people.get(v).scnum = Math.min(people.get(e.index).scnum + 1, people.get(v).scnum);
 			}
-			
 		}
 	}
 	
@@ -281,6 +284,9 @@ public class Graph {
 			}
 		}
 		dfscount = 0;
+		for(Person p: people){
+			System.out.println(p.name + " " + p.back);
+		}
 	}
 	private void  dfscon(int v, boolean[] visited, boolean[] knex) {
 		visited[v] = true;
