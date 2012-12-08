@@ -61,7 +61,12 @@ public class Graph {
 		this.sccount = 1;
 		this.size = people.size();
 		this.people = people;
-		this.schoolname = people.get(0).school;
+		try{
+			this.schoolname = people.get(0).school;
+		}catch (Exception indexOutOfBoundsException){
+			System.out.println("Invalid school name!");
+			return;
+		}
 		this.hash = new Hashtable<String, Integer>(this.people.size());
 		for(int i = 0; i<people.size(); i++) {
 			this.hash.put(people.get(i).name, i);
@@ -72,8 +77,7 @@ public class Graph {
 			Friend newfriends = null;
 			Friend ptr = this.people.get(i).friends;
 			while(ptr != null){
-				this.indexForName(ptr.name);		
-				ptr.index = this.indexForName(ptr.name);
+				ptr.index = this.indexForName(ptr.name);System.out.println(ptr.index + ptr.name);
 				if(ptr.index != -1){
 					newfriends = new Friend(ptr.index, newfriends);
 				}
@@ -201,12 +205,10 @@ public class Graph {
 		}
 	}
 	private void scdfs(int v, boolean[] visited){
-		System.out.println("here");
 		visited[v] = true;
 		for (Friend e = people.get(v).friends; e != null; e=e.next){
 			if(!visited[e.index]){
 				people.get(e.index).scnum = sccount;
-						System.out.println("visiting " + people.get(e.index).name + ": " + sccount);
 				sccount++;	
 				scdfs(e.index, visited);
 				sccount--;
@@ -291,7 +293,6 @@ public class Graph {
 		
 		for (int v = 0; v < visited.length; v++) {
 			if (!visited[v]) {
-				System.out.println("starting dfs again");
 				dfscon(v, visited, knex);
 			}
 		}
@@ -301,19 +302,21 @@ public class Graph {
 				min++;
 				if(min >= 2){knex[0] = true;}
 			}
-			if(knex[n]){
-				System.out.println(people.get(n).name);
-			}
+//			if(knex[n]){
+//				System.out.println(people.get(n).name);
+//			}
 		}
-		System.out.println("Connectors:");
+		System.out.print("Connectors:");
+		String s = "";
 		for(int i=0; i<knex.length; i++){
 			if(knex[i]){
-				System.out.println(people.get(i).name);
+				s = people.get(i).name + ", "+ s;
 			}
 		}
+		System.out.println(s);
 		dfscount = 0;
 		for(Person p: people){
-			System.out.println(p.name + " " + p.back);
+//			System.out.println(p.name + " " + p.back);
 		}
 	}
 	private void  dfscon(int v, boolean[] visited, boolean[] knex) {
@@ -321,7 +324,7 @@ public class Graph {
 		people.get(v).dfsnum = dfscount;
 		people.get(v).back = dfscount;
 		dfscount++;
-		System.out.println("Visiting " + people.get(v).name + " num: " + people.get(v).dfsnum);
+//		System.out.println("Visiting " + people.get(v).name + " num: " + people.get(v).dfsnum);
 
 		for (Friend w = people.get(v).friends; w != null; w=w.next) {
 			if (!visited[w.index]) {
@@ -335,7 +338,7 @@ public class Graph {
 			}
 			else{//w is already visited
 				people.get(v).back = Math.min(people.get(v).back, people.get(w.index).dfsnum);
-				System.out.println(people.get(w.index).name + " " + people.get(w.index).dfsnum + "/" + people.get(w.index).back);
+				//System.out.println(people.get(w.index).name + " " + people.get(w.index).dfsnum + "/" + people.get(w.index).back);
 			}	
 		}
 		
