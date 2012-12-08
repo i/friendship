@@ -7,7 +7,8 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-import Structures.Graph;
+import structures.Graph;
+
 
 
 public class Friends {
